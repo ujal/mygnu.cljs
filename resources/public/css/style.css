@@ -1,0 +1,26 @@
+html, body, #app {
+  margin: 0;
+  height: 100%;
+  min-height: 100%;
+  box-sizing: border-box;
+  background: hsla(0, 0%, 95%, 1);
+}
+
+#app > .board {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+}
+
+.board > div {
+  width: 50%;
+}
+
+.headers {
+  text-align: center;
+}
+.mcoords{
+  text-align: center;
+}
