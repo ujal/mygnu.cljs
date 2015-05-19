@@ -16,9 +16,12 @@
 
 ;; define your app data so that it doesn't get over-written on reload
 
+(def state
+  {:mouse {:x 0 :y 0}
+   :particle-list []})
+
 (defonce app-state
-  (atom {:mouse {:x 0 :y 0}
-         :particle-list []}))
+  (atom state))
 
 (defn new-particle [s t]
   {:string s
@@ -33,17 +36,22 @@
    :origin-x nil
    :origin-y nil})
 
+;(def headers ["Interactive"
+              ;"Design & Development"])
+
 (def string-list
   [{:string "Interactive" :type :header-first}
    {:string "Design & Development" :type :header-second}])
 
-(defn create-particles [{:keys [string type]}]
-  (mapv #(new-particle % type) string))
+(defn create-particles [s t]
+  (mapv #(new-particle % t) s))
 
-(defonce populate-particle-list
-  (swap! app-state
-         update-in [:particle-list]
-         into (mapv create-particles string-list)))
+(defn swap-particles [xs]
+  (swap! app-state update-in [:particle-list] into xs))
+
+(defonce populate-particles
+  ((swap-particles (create-particles (headers 0) :header-first))
+  (swap-particles (create-particles (headers 1) :header-second))))
 
 
 (defn handle-mouse-move [e data]
