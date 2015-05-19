@@ -16,12 +16,13 @@
 
 ;; define your app data so that it doesn't get over-written on reload
 
-(def state
-  {:mouse {:x 0 :y 0}
-   :particle-list []})
-
 (defonce app-state
-  (atom state))
+  (atom {:mouse {:x 0 :y 0}
+         :particle-list []}))
+
+(def text
+  [{:s "Interactive" :stype :hfirst}
+   {:s "Design & Development" :stype :hsecond}])
 
 (defn new-particle [s t]
   {:string s
@@ -36,22 +37,17 @@
    :origin-x nil
    :origin-y nil})
 
-;(def headers ["Interactive"
-              ;"Design & Development"])
+(defn create-particles [{:keys [s stype]}]
+  (mapv #(new-particle % stype) s))
 
-(def string-list
-  [{:string "Interactive" :type :header-first}
-   {:string "Design & Development" :type :header-second}])
-
-(defn create-particles [s t]
-  (mapv #(new-particle % t) s))
-
-(defn swap-particles [xs]
+(defn add-particles [xs]
   (swap! app-state update-in [:particle-list] into xs))
 
-(defonce populate-particles
-  ((swap-particles (create-particles (headers 0) :header-first))
-  (swap-particles (create-particles (headers 1) :header-second))))
+(let [ps-hfirst (create-particles (text 0))
+      ps-hsecond (create-particles (text 1))]
+  (defonce populate-particles
+    ((add-particles ps-hfirst)
+     (add-particles ps-hsecond))))
 
 
 (defn handle-mouse-move [e data]
@@ -84,8 +80,8 @@
       (sab/html
         [:div.board {:on-mouse-move #(handle-mouse-move % data)}
          [:div.headers
-          [:div.header (build-particles data :header-first)]
-          [:div.header (build-particles data :header-second)]]
+          [:div.header (build-particles data :hfirst)]
+          [:div.header (build-particles data :hsecond)]]
          [:br]
          [:div.mcoords
           [:span "x:" (-> data :mouse :x)] " "
