@@ -20,9 +20,8 @@
   (atom {:mouse {:x 0 :y 0}
          :particle-list []}))
 
-(def text
-  [{:s "Interactive" :stype :hfirst}
-   {:s "Design & Development" :stype :hsecond}])
+(def text [{:s "Interactive" :s-type :hfirst}
+           {:s "Design & Development" :s-type :hsecond}])
 
 (defn new-particle [s t]
   {:string s
@@ -37,17 +36,14 @@
    :origin-x nil
    :origin-y nil})
 
-(defn create-particles [{:keys [s stype]}]
-  (mapv #(new-particle % stype) s))
+(defn create-particles [{:keys [s s-type]}]
+  (mapv #(new-particle % s-type) s))
 
-(defn add-particles [xs]
-  (swap! app-state update-in [:particle-list] into xs))
-
-(let [ps-hfirst (create-particles (text 0))
-      ps-hsecond (create-particles (text 1))]
-  (defonce populate-particles
-    ((add-particles ps-hfirst)
-     (add-particles ps-hsecond))))
+(defonce populate-particles
+  (let [ps-hfirst (create-particles (text 0))
+        ps-hsecond (create-particles (text 1))
+        ps (into ps-hfirst ps-hsecond)]
+    (swap! app-state update-in [:particle-list] into ps)))
 
 
 (defn handle-mouse-move [e data]
