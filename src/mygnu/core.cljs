@@ -20,12 +20,12 @@
   (atom {:mouse {:x 0 :y 0}
          :particle-list []}))
 
-(def text [{:s "Interactive" :s-type :hfirst}
-           {:s "Design & Development" :s-type :hsecond}])
+(def text [{:s "Interactive" :type :hfirst}
+           {:s "Design & Development" :type :hsecond}])
 
-(defn new-particle [s t]
-  {:string s
-   :type t
+(defn new-particle [char type]
+  {:char char
+   :type type
    :x 0
    :y 0
    :vx 0
@@ -36,18 +36,15 @@
    :origin-x nil
    :origin-y nil})
 
-(defn create-particles [{:keys [s s-type]}]
-  (mapv #(new-particle % s-type) s))
+(defn create-particles [{:keys [s type]}]
+  (mapv #(new-particle % type) s))
 
 (defonce populate-particles
-  (let [ps-hfirst (create-particles (text 0))
-        ps-hsecond (create-particles (text 1))
-        ps (into ps-hfirst ps-hsecond)]
-    (swap! app-state update-in [:particle-list] into ps)))
+    (swap! app-state
+           assoc :particle-list
+           (into (create-particles (text 0))
+                 (create-particles (text 1)))))
 
-
-(defn handle-mouse-move [e data]
-  (om/update! data :mouse {:x e.pageX :y e.pageY}))
 
 (defn particle-view [data owner]
   (reify
@@ -68,6 +65,9 @@
 (defn build-particles [{:keys [particle-list]} type]
   (map-indexed #(om/build particle-view %2 {:react-key %1})
                (filter #(= (:type %) type) particle-list)))
+
+(defn handle-mouse-move [e data]
+  (om/update! data :mouse {:x e.pageX :y e.pageY}))
 
 (defn app-view [data owner]
   (reify
