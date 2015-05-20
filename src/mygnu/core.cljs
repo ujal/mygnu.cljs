@@ -20,8 +20,9 @@
   (atom {:mouse {:x 0 :y 0}
          :particle-list []}))
 
-(def text [{:s "Interactive" :type :hfirst}
-           {:s "Design & Development" :type :hsecond}])
+(def texts [{:s "Interactive" :type :hfirst}
+            {:s "Design & Development" :type :hsecond}
+            {:s "Test" :type :page-about}])
 
 (defn new-particle [char type]
   {:char char
@@ -41,10 +42,8 @@
 
 (defonce populate-particles
     (swap! app-state
-           assoc :particle-list
-           (into (create-particles (text 0))
-                 (create-particles (text 1)))))
-
+           update-in [:particle-list]
+           #(reduce into (mapv create-particles texts))))
 
 (defn particle-view [data owner]
   (reify
@@ -59,7 +58,7 @@
     om/IRender
     (render [_]
       (sab/html
-        [:span (:string data)]))))
+        [:span (:char data)]))))
 
 
 (defn build-particles [{:keys [particle-list]} type]
