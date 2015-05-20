@@ -39,10 +39,13 @@
 (defn create-particles [{:keys [s type]}]
   (mapv #(new-particle % type) s))
 
+(def xf->particles
+  (mapcat create-particles))
+
 (defonce populate-particles
-    (swap! app-state
-           assoc :particle-list
-           (reduce into (mapv create-particles texts))))
+  (swap! app-state
+         update-in [:particle-list]
+         #(into % xf->particles texts)))
 
 (defn particle-view [data owner]
   (reify
@@ -94,6 +97,7 @@
 )
 
 (js/console.log @app-state)
+(println @app-state)
 ;(println @app-state)
 ;(repl/source conj)
 ;(repl/doc defonce)
