@@ -21,8 +21,7 @@
          :particle-list []}))
 
 (def texts [{:s "Interactive" :type :hfirst}
-            {:s "Design & Development" :type :hsecond}
-            {:s "Test" :type :page-about}])
+            {:s "Design & Development" :type :hsecond}])
 
 (defn new-particle [char type]
   {:char char
@@ -42,8 +41,8 @@
 
 (defonce populate-particles
     (swap! app-state
-           update-in [:particle-list]
-           #(reduce into (mapv create-particles texts))))
+           assoc :particle-list
+           (reduce into (mapv create-particles texts))))
 
 (defn particle-view [data owner]
   (reify
