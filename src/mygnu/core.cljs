@@ -16,12 +16,16 @@
 
 ;; define your app data so that it doesn't get over-written on reload
 
+(def texts
+  [["Interactive" :hfirst]
+   ["Design & Development" :hsecond]
+   ["ABOUT" :nav]
+   ["PROJECTS" :nav]
+   ["TOOLS" :nav]])
+
 (defonce app-state
   (atom {:mouse {:x 0 :y 0}
          :particle-list []}))
-
-(def texts [{:s "Interactive" :type :hfirst}
-            {:s "Design & Development" :type :hsecond}])
 
 (defn new-particle [char type]
   {:char char
@@ -36,16 +40,11 @@
    :origin-x nil
    :origin-y nil})
 
-(defn create-particles [{:keys [s type]}]
-  (mapv #(new-particle % type) s))
+(defn particle-type [type]
+  #(= (:type %) type))
 
-(def xf->particles
-  (mapcat create-particles))
-
-(defonce populate-particles
-  (swap! app-state
-         update-in [:particle-list]
-         #(into % xf->particles texts)))
+(defn text-type [type]
+  #(= (last %) type))
 
 (defn particle-view [data owner]
   (reify
@@ -65,7 +64,7 @@
 
 (defn build-particles [{:keys [particle-list]} type]
   (map-indexed #(om/build particle-view %2 {:react-key %1})
-               (filter #(= (:type %) type) particle-list)))
+               (filter (particle-type type) particle-list)))
 
 (defn handle-mouse-move [e data]
   (om/update! data :mouse {:x e.pageX :y e.pageY}))
@@ -80,24 +79,39 @@
           [:div.header (build-particles data :hfirst)]
           [:div.header (build-particles data :hsecond)]]
          [:br]
+         [:ul {:class "nav"} (for [i (filter (text-type :nav) texts)]
+                [:li {:key (gensym)} (first i)])]
          [:div.mcoords
           [:span "x:" (-> data :mouse :x)] " "
           [:span "y:" (-> data :mouse :y)]]]))))
 
+
+(defn create-particles [[string type]]
+  (mapv #(new-particle % type) string))
+
+(def xf-particles
+  (mapcat create-particles))
+
+(defn particles [state]
+  (-> state
+      (assoc :particle-list (into [] xf-particles texts))))
+
+(defonce fill-state
+  (swap! app-state particles))
 
 (om/root app-view
          app-state
          {:target (. js/document (getElementById "app"))})
 
 
+
 (defn on-js-reload []
   ;; optionally touch your app-state to force rerendering depending on
   ;; your application
-  ;; (swap! app-state update-in [:mouse :x] inc)
+   ;(swap! app-state update-in [:mouse :x] inc)
 )
 
 (js/console.log @app-state)
-(println @app-state)
 ;(println @app-state)
 ;(repl/source conj)
 ;(repl/doc defonce)
