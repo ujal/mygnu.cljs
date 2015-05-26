@@ -1,0 +1,19 @@
+{
+  "name": "mygnu",
+  "version": "0.0.0",
+  "authors": [
+    "Udschal Imanov <udschal.imanov@gmail.com>"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "skeleton": "~2.0.4",
+    "html5-boilerplate": "~5.2.0"
+  }
+}

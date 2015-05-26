@@ -14,32 +14,34 @@
                  [binaryage/devtools "0.2.2"]]
 
   :plugins [[lein-cljsbuild "1.0.5"]
-            [lein-figwheel "0.3.1"]]
+            [lein-figwheel "0.3.3"]]
 
   :source-paths ["src"]
 
   :clean-targets ^{:protect false} ["resources/public/js/compiled" "target"]
 
   :cljsbuild {
-    :builds [{:id "dev"
-              :source-paths ["src"]
+              :builds [{:id "dev"
+                        :source-paths ["src"]
 
-              :figwheel { :on-jsload "mygnu.core/on-js-reload" }
+                        :figwheel {:on-jsload "mygnu.core/on-js-reload" 
+                                   :websocket-host "192.168.1.41"
+                                   :websocket-url "ws://192.168.1.41:3449/figwheel-ws"}
 
-              :compiler {:main mygnu.core
-                         :asset-path "js/compiled/out"
-                         :output-to "resources/public/js/compiled/mygnu.js"
-                         :output-dir "resources/public/js/compiled/out"
-                         :optimizations :none
-                         :source-map true
-                         :source-map-timestamp true
-                         :cache-analysis true }}
-             {:id "min"
-              :source-paths ["src"]
-              :compiler {:output-to "resources/public/js/compiled/mygnu.js"
-                         :main mygnu.core
-                         :optimizations :advanced
-                         :pretty-print false}}]}
+                        :compiler {:main mygnu.core
+                                   :asset-path "js/compiled/out"
+                                   :output-to "resources/public/js/compiled/mygnu.js"
+                                   :output-dir "resources/public/js/compiled/out"
+                                   :optimizations :none
+                                   :source-map true
+                                   :source-map-timestamp true
+                                   :cache-analysis true }}
+                       {:id "min"
+                        :source-paths ["src"]
+                        :compiler {:output-to "resources/public/js/compiled/mygnu.js"
+                                   :main mygnu.core
+                                   :optimizations :advanced
+                                   :pretty-print false}}]}
 
   :figwheel {
              ;; :http-server-root "public" ;; default and assumes "resources"

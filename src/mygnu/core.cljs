@@ -7,7 +7,8 @@
             [clojure.data :as data]
             [clojure.string :as string]
             [cljs.repl :as repl]
-            [devtools.core :as devtools]))
+            [devtools.core :as devtools]
+            [mygnu.style :as style]))
 
 (enable-console-print!)
 (js/console.clear)
@@ -74,11 +75,10 @@
     om/IRender
     (render [_]
       (sab/html
-        [:div.board {:on-mouse-move #(handle-mouse-move % data)}
-         [:div.headers
-          [:div.header (build-particles data :hfirst)]
-          [:div.header (build-particles data :hsecond)]]
-         [:br]
+        [:div {:on-mouse-move #(handle-mouse-move % data) :style (style/app)}
+         [:div.headings
+          [:div.heading (build-particles data :hfirst)]
+          [:div.heading (build-particles data :hsecond)]]
          [:ul {:class "nav"} (for [i (filter (text-type :nav) texts)]
                 [:li {:key (gensym)} (first i)])]
          [:div.mcoords
@@ -92,12 +92,12 @@
 (def xf-particles
   (mapcat create-particles))
 
-(defn particles [state]
+(defn fill-particles [state]
   (-> state
       (assoc :particle-list (into [] xf-particles texts))))
 
 (defonce fill-state
-  (swap! app-state particles))
+  (swap! app-state fill-particles))
 
 (om/root app-view
          app-state
@@ -111,7 +111,7 @@
    ;(swap! app-state update-in [:mouse :x] inc)
 )
 
-(js/console.log @app-state)
+;(js/console.log @app-state)
 ;(println @app-state)
 ;(repl/source conj)
 ;(repl/doc defonce)
