@@ -1,5 +1,6 @@
 (defproject mygnu "0.1.0-SNAPSHOT"
-  :jvm-opts ["-Xmx512m"]
+  ;:jvm-opts ["-Xmx512m -javaagent:'/Users/ujal/riemann-jvm-profiler/target/riemann-jvm-profiler.jar=prefix=my app,host=localhost:4567'"]
+  :jvm-opts ["-javaagent:/Users/ujal/riemann-jvm-profiler/target/riemann-jvm-profiler-0.1.0-standalone.jar=prefix=myapp,host=localhost:4567"]
 
   :description "FIXME: write this!"
   :url "http://example.com/FIXME"
@@ -11,7 +12,8 @@
                  [org.clojure/core.async "0.1.346.0-17112a-alpha"]
                  [sablono "0.3.4"]
                  [org.omcljs/om "0.8.8"]
-                 [binaryage/devtools "0.2.2"]]
+                 [binaryage/devtools "0.2.2"]
+                 [camel-snake-kebab "0.3.1"]]
 
   :plugins [[lein-cljsbuild "1.0.5"]
             [lein-figwheel "0.3.3"]]
@@ -25,8 +27,8 @@
                         :source-paths ["src"]
 
                         :figwheel {:on-jsload "mygnu.core/on-js-reload" 
-                                   :websocket-host "192.168.1.41"
-                                   :websocket-url "ws://192.168.1.41:3449/figwheel-ws"}
+                                   :websocket-host "192.168.1.4"
+                                   :websocket-url "ws://192.168.1.4:3449/figwheel-ws"}
 
                         :compiler {:main mygnu.core
                                    :asset-path "js/compiled/out"
@@ -41,7 +43,8 @@
                         :compiler {:output-to "resources/public/js/compiled/mygnu.js"
                                    :main mygnu.core
                                    :optimizations :advanced
-                                   :pretty-print false}}]}
+                                   :pretty-print false
+                                   :externs ["externs.js"]}}]}
 
   :figwheel {
              ;; :http-server-root "public" ;; default and assumes "resources"

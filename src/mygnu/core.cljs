@@ -17,16 +17,16 @@
 
 ;; define your app data so that it doesn't get over-written on reload
 
+(defonce app-state
+  (atom {:mouse {:x 0 :y 0}
+         :particle-list []}))
+
 (def texts
   [["Interactive" :hfirst]
    ["Design & Development" :hsecond]
    ["ABOUT" :nav]
    ["PROJECTS" :nav]
    ["TOOLS" :nav]])
-
-(defonce app-state
-  (atom {:mouse {:x 0 :y 0}
-         :particle-list []}))
 
 (defn new-particle [char type]
   {:char char
@@ -75,8 +75,8 @@
     om/IRender
     (render [_]
       (sab/html
-        [:div {:on-mouse-move #(handle-mouse-move % data) :style (style/app)}
-         [:div.headings
+        [:div.app {:on-mouse-move #(handle-mouse-move % data) :style (style/app)}
+         [:div.headings {:style (style/headings)}
           [:div.heading (build-particles data :hfirst)]
           [:div.heading (build-particles data :hsecond)]]
          [:ul {:class "nav"} (for [i (filter (text-type :nav) texts)]

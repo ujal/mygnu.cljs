@@ -1,15 +1,39 @@
 (ns mygnu.style
-  (:require [clojure.set :refer [rename-keys]]))
+  (:require [clojure.set :refer [rename-keys]]
+            [camel-snake-kebab.core :as csk]))
 
 (def transform-prop
   (js/Modernizr.prefixed "transform"))
 
-(def app-styles
-  {:transform "translateY(-50%)"
-   :position "relative"
-   :top "50%"})
+(defn rm [n]
+  (str n "rem"))
+
+(defn px [n]
+  (str n "px"))
+
+(defn prefix [styles]
+  (rename-keys styles {:transform transform-prop}))
+
+(defn camelize [styles]
+  (into {} (for [[k v] styles] (vector (csk/->camelCase k) v))))
+
+(def font-size-base 1.5)
+(def line-height-base 1.6)
 
 (defn app []
-  (rename-keys app-styles {:transform transform-prop}))
+  (-> {:transform "translateY(-50%)"
+       :position "relative"
+       :top "45%"}
+      prefix))
 
+(defn headings []
+  (-> {:font-size (rm (* font-size-base 1.2))
+       :font-family "Montserrat"
+       :font-weight "bold"
+       :margin "1.2rem 0"}
+      prefix
+      camelize))
 
+(defn nav []
+  {:list-style "none"
+   :margin "1.2rem 0"})
