@@ -2,14 +2,14 @@
   (:require [clojure.set :refer [rename-keys]]
             [camel-snake-kebab.core :as csk]))
 
-(def transform-prop
-  (js/Modernizr.prefixed "transform"))
-
 (defn rm [n]
   (str n "rem"))
 
 (defn px [n]
   (str n "px"))
+
+(def transform-prop
+  (js/Modernizr.prefixed "transform"))
 
 (defn prefix [styles]
   (rename-keys styles {:transform transform-prop}))
@@ -20,20 +20,28 @@
 (def font-size-base 1.5)
 (def line-height-base 1.6)
 
-(defn app []
+(defn content []
   (-> {:transform "translateY(-50%)"
        :position "relative"
        :top "45%"}
-      prefix))
+    prefix))
 
 (defn headings []
   (-> {:font-size (rm (* font-size-base 1.2))
        :font-family "Montserrat"
        :font-weight "bold"
-       :margin "1.2rem 0"}
+       :margin "1.2rem"}
       prefix
       camelize))
 
 (defn nav []
-  {:list-style "none"
-   :margin "1.2rem 0"})
+  (-> {:list-style "none"
+       :margin "1.2rem"}
+      camelize))
+
+(defn nav--li []
+  (-> {:list-style "none"
+       :margin "1.2rem"
+       :display "inline"}
+      camelize))
+

@@ -20,16 +20,17 @@
   src: local('Montserrat-Bold'), url(http://themes.googleusercontent.com/static/fonts/montserrat/v4/IQHow_FEYlDC4Gzy_m8fcnbFhgvWbfSbdVg11QabG8w.woff) format('woff');
 }
 
-body, html, #app {
+body, html, #app, .board {
   height: 100%;
   text-align: center;
   background: white;
   overflow: auto;
 }
 
-.nav li {
-  display: inline;
-  padding: 0 1.2rem;
-}
+
+/*.nav li {*/
+  /*display: inline;*/
+  /*padding: 0 1.2rem;*/
+/*}*/
 
 /*.mcoords { display: none; }*/

@@ -22,8 +22,8 @@
          :particle-list []}))
 
 (def texts
-  [["Interactive" :hfirst]
-   ["Design & Development" :hsecond]
+  [["INTERACTIVE" :hfirst]
+   ["DESIGN & DEVELOPMENT" :hsecond]
    ["ABOUT" :nav]
    ["PROJECTS" :nav]
    ["TOOLS" :nav]])
@@ -63,7 +63,7 @@
         [:span (:char data)]))))
 
 
-(defn build-particles [{:keys [particle-list]} type]
+(defn particles-view [{:keys [particle-list]} type]
   (map-indexed #(om/build particle-view %2 {:react-key %1})
                (filter (particle-type type) particle-list)))
 
@@ -75,15 +75,17 @@
     om/IRender
     (render [_]
       (sab/html
-        [:div.app {:on-mouse-move #(handle-mouse-move % data) :style (style/app)}
-         [:div.headings {:style (style/headings)}
-          [:div.heading (build-particles data :hfirst)]
-          [:div.heading (build-particles data :hsecond)]]
-         [:ul {:class "nav"} (for [i (filter (text-type :nav) texts)]
-                [:li {:key (gensym)} (first i)])]
-         [:div.mcoords
-          [:span "x:" (-> data :mouse :x)] " "
-          [:span "y:" (-> data :mouse :y)]]]))))
+        [:div.board {:on-mouse-move #(handle-mouse-move % data)}
+         [:div.content {:style (style/content)}
+          [:div {:style (style/headings)}
+           [:div (particles-view data :hfirst)]
+           [:div (particles-view data :hsecond)]]
+          #_[:ul {:style (style/nav)}
+             (for [i (filter (text-type :nav) texts)]
+               [:li {:style (style/nav--li) :key (gensym)} (first i)])]
+          [:div.mcoords
+           [:span "x:" (-> data :mouse :x)] " "
+           [:span "y:" (-> data :mouse :y)]]]]))))
 
 
 (defn create-particles [[string type]]

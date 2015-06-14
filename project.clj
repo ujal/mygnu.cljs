@@ -1,6 +1,5 @@
 (defproject mygnu "0.1.0-SNAPSHOT"
-  ;:jvm-opts ["-Xmx512m -javaagent:'/Users/ujal/riemann-jvm-profiler/target/riemann-jvm-profiler.jar=prefix=my app,host=localhost:4567'"]
-  :jvm-opts ["-javaagent:/Users/ujal/riemann-jvm-profiler/target/riemann-jvm-profiler-0.1.0-standalone.jar=prefix=myapp,host=localhost:4567"]
+  :jvm-opts ["-Xmx512m"]
 
   :description "FIXME: write this!"
   :url "http://example.com/FIXME"
