@@ -24,7 +24,7 @@
   (-> {:transform "translateY(-50%)"
        :position "relative"
        :top "45%"}
-    prefix))
+      prefix))
 
 (defn headings []
   (-> {:font-size (rm (* font-size-base 1.2))
@@ -34,12 +34,12 @@
       prefix
       camelize))
 
-(defn nav []
+(defn ul []
   (-> {:list-style "none"
        :margin "1.2rem"}
       camelize))
 
-(defn nav--li []
+(defn li []
   (-> {:list-style "none"
        :margin "1.2rem"
        :display "inline"}

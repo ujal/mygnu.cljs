@@ -8,7 +8,7 @@
             [clojure.string :as string]
             [cljs.repl :as repl]
             [devtools.core :as devtools]
-            [mygnu.style :as style]))
+            [mygnu.style :as st]))
 
 (enable-console-print!)
 (js/console.clear)
@@ -76,13 +76,13 @@
     (render [_]
       (sab/html
         [:div.board {:on-mouse-move #(handle-mouse-move % data)}
-         [:div.content {:style (style/content)}
-          [:div {:style (style/headings)}
+         [:div.content {:style (st/content)}
+          [:div {:style (st/headings)}
            [:div (particles-view data :hfirst)]
            [:div (particles-view data :hsecond)]]
-          #_[:ul {:style (style/nav)}
+          #_[:ul {:style (st/ul)}
              (for [i (filter (text-type :nav) texts)]
-               [:li {:style (style/nav--li) :key (gensym)} (first i)])]
+               [:li {:style (st/li) :key (gensym)} (first i)])]
           [:div.mcoords
            [:span "x:" (-> data :mouse :x)] " "
            [:span "y:" (-> data :mouse :y)]]]]))))
