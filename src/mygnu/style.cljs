@@ -23,7 +23,8 @@
 (defn content []
   (-> {:transform "translateY(-50%)"
        :position "relative"
-       :top "45%"}
+       :top "45%"
+       :color "hsla(0, 0%, 10%, 1)"}
       prefix))
 
 (defn headings []
