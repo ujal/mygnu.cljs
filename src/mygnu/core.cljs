@@ -25,9 +25,9 @@
 (def content
   [["INTERACTIVE" :hfirst]
    ["DESIGN & DEVELOPMENT" :hsecond]
-   ;["ABOUT" :nav]
-   ;["PROJECTS" :nav]
-   ;["TOOLS" :nav]
+   ["ABOUT" :nav]
+   ["PROJECTS" :nav]
+   ["TOOLS" :nav]
    ])
 
 (defn new-particle [char type]
@@ -58,10 +58,11 @@
       (sab/html
         [:span (:char data)]))))
 
+(defn particle [i data]
+  (om/build particle-view data {:react-key i}))
 
 (defn particles-view [{:keys [particle-list]} type]
-  (map-indexed #(om/build particle-view %2 {:react-key %1})
-               (filter #(= (:type %) type) particle-list)))
+  (map-indexed particle (filter #(= (:type %) type) particle-list)))
 
 (defn handle-mouse-move [e data]
   (om/update! data :mouse {:x e.pageX :y e.pageY}))
@@ -74,16 +75,17 @@
         [:div.board {:on-mouse-move #(handle-mouse-move % data)}
          [:div.content {:style (st/content)}
           [:div {:style (st/headings)}
-           [:div (particles-view data :hfirst)]
-           [:div (particles-view data :hsecond)]]
+           #_[:div (particles-view data :hfirst)]
+           #_[:div (particles-view data :hsecond)]]
           [:ul {:style (st/ul)}
-             (for [i (filter #(= (last %) type) content)]
-               [:li {:style (st/li) :key (gensym)} (first i)])]
+           (for [i (filter #(= (last %) :nav) content)]
+             [:li {:style (st/li) :key (gensym)} (first i)])]
           [:div.mcoords
            [:span "x:" (-> data :mouse :x)] " "
            [:span "y:" (-> data :mouse :y)]]]]))))
 
 (defn time-update [timestamp state]
+  state
   (-> state
       (assoc
         :cur-time timestamp
@@ -91,7 +93,8 @@
       #_update-particles))
 
 (defn time-loop [time]
-  (let [new-state (swap! app-state (partial time-update time))]
+  (let [cursor (om/root-cursor app-state)
+        new-state (om/transact! cursor (partial time-update time))]
     ;(when (:hover new-state)
     (when true
       (go
@@ -110,8 +113,8 @@
 (defn update-state []
   (js/requestAnimationFrame
     (fn [time]
-      (reset! app-state (reset-state @app-state time))
-      (time-loop time))))
+      (om/update! (om/root-cursor app-state) (reset-state @app-state time))
+      #_(time-loop time))))
 
 (defn mount-root []
   (om/root app-view
