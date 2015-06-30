@@ -12,6 +12,7 @@
                  [reagent "0.5.0"]
                  [re-frame "0.4.1"]
                  [camel-snake-kebab "0.3.1"]
+                 [bardo "0.1.1-SNAPSHOT"]
                  [binaryage/devtools "0.3.0"]]
 
   :plugins [[lein-cljsbuild "1.0.5"]

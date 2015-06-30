@@ -9,7 +9,7 @@
             [devtools.core :as devtools]))
 
 (enable-console-print!)
-(js/console.clear)
+;(js/console.clear)
 (defonce install-devtools (devtools/install!))
 
 
@@ -18,7 +18,7 @@
   ;(when (:hover new-state)
   (when true
     (go
-      (<! (timeout 1000))
+      ;(<! (timeout 250))
       (js/requestAnimationFrame time-loop))))
 
 (defn update! []
@@ -38,7 +38,4 @@
 
 
 (defn on-js-reload []
-  (init))
-
-
-
+  (mount-root))

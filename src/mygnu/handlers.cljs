@@ -1,14 +1,15 @@
 (ns mygnu.handlers
+  (:require-macros [cljs.core.async.macros :refer [go-loop go]])
   (:require [re-frame.core :as r]
-            [mygnu.db :as db]))
+            [mygnu.db :as db]
+            [cljs.core.async :refer [<! chan sliding-buffer put! close! timeout]]
+            [bardo.transition :refer [transition]]))
 
 (def content
-  [["INTERACTIVE" :hfirst]
-   ["DESIGN & DEVELOPMENT" :hsecond]
-   ;["ABOUT" :nav]
-   ;["PROJECTS" :nav]
-   ;["TOOLS" :nav]
-   ])
+  [["INTERACTIVE"]
+   ["DESIGN & DEVELOPMENT"]
+   ["ABOUT PROJECTS TOOLS"]
+   ["Hi, my name is Ujjal"]])
 
 (defn new-particle [id type char]
   {:id id
@@ -18,40 +19,66 @@
    :y 0
    :vx 0
    :vy 0
-   :el nil
    :width nil
    :height nil
    :origin-x nil
    :origin-y nil})
 
-(def xf-particles
-  (mapcat (fn [[string type]]
-            (map #(new-particle (gensym) type %) string))))
+(defn now []
+  (.getTime (js/Date.)))
 
 (r/register-handler
  :initialize-db
  (fn  [_ _]
-   (assoc db/default-db :particle-list (into [] xf-particles content))))
+   db/default-db))
 
 (r/register-handler
-  ;;TODO
- :update-particle
- (fn  [state [_ id data]]
-   ;(filter #(= id (:id %))) (:particle-list state)
-   (update state :particle-list #(conj % data))))
+ :add-particle
+ (fn  [state [_ {:keys [id] :as p}]]
+   (assoc-in state [:particle-list id] p)))
+
+(defn update-char [state]
+  (let [rid (rand-nth (keys (:particle-list state)))]
+    ;(assoc-in state [:particle-list rid :char] (first (shuffle [\I \N \T])))))
+    ;(assoc-in state [:particle-list rid :char] (rand-nth (map char (range 97 123))))))
+    (assoc-in state [:particle-list rid :char] (rand-nth (map char (range 65 90))))))
+
+
+(defn update-color [state e]
+  (let [rid (rand-nth (keys (:particle-list state)))]
+    (assoc-in state
+              [:particle-list rid :color]
+              (str "hsla(" "0, 0%,"
+                   (min 80 (max 30 (mod e.clientX 100)))
+                   "%, 1)"))))
+
+(r/register-handler
+ :update-opacity
+ (fn [state [_ rid o]]
+   (assoc-in state [:particle-list rid :opacity] o)))
+
+(defn animate-opacity [state]
+  (let [rid (rand-nth (keys (:particle-list state)))
+        ch (transition 0 1 {:duration 1500})]
+    (go-loop
+      []
+      (when-let [o (<! ch)]
+        (r/dispatch-sync [:update-opacity rid o])
+        (recur)))
+    state))
 
 (r/register-handler
  :handle-mouse-move
  (fn [state [_ e]]
-   (assoc state :mouse {:x e.clientX :y e.clientY})))
+   (-> state
+       #_update-char
+       (update-color e)
+       (animate-opacity))))
 
 (r/register-handler
   :time-update
-  (fn [state [_ timestamp]]
-    (println "time-to-update!")
+  (fn [state [_ t]]
     (-> state
-        (assoc
-          :cur-time timestamp
-          :time-delta (- timestamp (:start-time state)))
-        #_update-particles)))
+        #_update-particles
+        #_(update-color (rand-int 360)))))
 

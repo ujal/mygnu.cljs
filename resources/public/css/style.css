@@ -1,28 +1,13 @@
 @import '../bower_components/skeleton/css/normalize.css';
 @import '../bower_components/skeleton/css/skeleton.css';
 
-@font-face {
-  font-family: 'Vollkorn';
-  font-style: italic;
-  font-weight: 400;
-  src: local('Vollkorn Italic'), local('Vollkorn-Italic'), url(http://themes.googleusercontent.com/static/fonts/vollkorn/v4/Oiz0tNwvC-Nd29SBQWfWTL3hpw3pgy2gAi-Ip7WPMi0.woff) format('woff');
-}
-@font-face {
-  font-family: 'Montserrat';
-  font-style: normal;
-  font-weight: 400;
-  src: local('Montserrat-Regular'), url(http://themes.googleusercontent.com/static/fonts/montserrat/v4/zhcz-_WihjSQC0oHJ9TCYL3hpw3pgy2gAi-Ip7WPMi0.woff) format('woff');
-}
-@font-face {
-  font-family: 'Montserrat';
-  font-style: bold;
-  font-weight: 700;
-  src: local('Montserrat-Bold'), url(http://themes.googleusercontent.com/static/fonts/montserrat/v4/IQHow_FEYlDC4Gzy_m8fcnbFhgvWbfSbdVg11QabG8w.woff) format('woff');
-}
+@import url(http://fonts.googleapis.com/css?family=Montserrat:400,700);
+@import url(http://fonts.googleapis.com/css?family=Vollkorn:400italic,700italic,400,700);
+@import url(http://fonts.googleapis.com/css?family=VT323);
 
 body, html, #app, .board {
   height: 100%;
   text-align: center;
-  background: white;
+  background: hsla(9, 100%, 99.5%, 1);
   overflow: auto;
 }

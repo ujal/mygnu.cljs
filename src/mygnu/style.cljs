@@ -17,32 +17,50 @@
 (defn camelize [styles]
   (into {} (for [[k v] styles] (vector (csk/->camelCase k) v))))
 
-(def font-size-base 1.5)
-(def line-height-base 1.6)
-
-(defn content []
-  (-> {:transform "translateY(-50%)"
-       :position "relative"
-       :top "45%"
-       :color "hsla(0, 0%, 10%, 1)"}
-      prefix))
-
-(defn headings []
-  (-> {:font-size (rm (* font-size-base 1.2))
-       :font-family "Montserrat"
-       :font-weight "bold"
-       :margin "1.2rem"}
+(defn pipe [m]
+  (-> m
       prefix
       camelize))
 
+(def fs 1.5)
+(def lh 1.6)
+(def lhs (* fs 1.6))
+
+(defn content []
+  (pipe
+    {:transform "translateY(-50%)"
+     :position "relative"
+     ;:top "45%"
+     :top (rm (* lhs 8))
+     :color "hsla(0, 0%, 20%, 1)"}))
+
+(defn headings []
+  (pipe
+    {:font-size (rm (* fs 1.4))
+     :font-family "Montserrat"
+     :font-weight "bold"
+     :margin-bottom (rm (* lhs 3))}))
+
 (defn ul []
-  (-> {:list-style "none"
-       :margin "1.2rem"}
-      camelize))
+  (pipe
+    {:list-style "none"
+     :margin "1.2rem"}))
 
 (defn li []
-  (-> {:list-style "none"
-       :margin "1.2rem"
-       :display "inline"}
-      camelize))
+  (pipe
+    {:list-style "none"
+     :margin "1.2rem"
+     :display "inline"}))
+
+(defn mcoords []
+  (pipe
+    {:list-style "none"
+     :display "inline"}))
+
+(defn board []
+  (pipe
+    {:font-size (rm (* fs 1.4))
+     ;:font-family "VT323"
+     :font-weight "normal"
+     :margin "2rem"}))
 
