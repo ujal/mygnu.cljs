@@ -43,7 +43,6 @@
     ;(assoc-in state [:particle-list rid :char] (rand-nth (map char (range 97 123))))))
     (assoc-in state [:particle-list rid :char] (rand-nth (map char (range 65 90))))))
 
-
 (defn update-color [state e]
   (let [rid (rand-nth (keys (:particle-list state)))]
     (assoc-in state
@@ -53,32 +52,29 @@
                    "%, 1)"))))
 
 (r/register-handler
- :update-opacity
- (fn [state [_ rid o]]
-   (assoc-in state [:particle-list rid :opacity] o)))
-
-(defn animate-opacity [state]
-  (let [rid (rand-nth (keys (:particle-list state)))
-        ch (transition 0 1 {:duration 1500})]
-    (go-loop
-      []
-      (when-let [o (<! ch)]
-        (r/dispatch-sync [:update-opacity rid o])
-        (recur)))
-    state))
+ :transition-callback
+ (fn [state [_ id k v]]
+   (assoc-in state [:particle-list id k] v)))
 
 (r/register-handler
- :handle-mouse-move
+ :transition
+ (fn [state [_ id k from to duration]]
+   (let [ch (transition from to {:duration duration})]
+     (go-loop []
+              (when-let [v (<! ch)]
+                (r/dispatch-sync [:transition-callback id k v])
+                (recur)))
+     state)))
+
+(r/register-handler
+ :mouse-move
  (fn [state [_ e]]
    (-> state
-       #_update-char
-       (update-color e)
-       (animate-opacity))))
+       (update-color e))))
 
 (r/register-handler
   :time-update
   (fn [state [_ t]]
     (-> state
-        #_update-particles
-        #_(update-color (rand-int 360)))))
+        (update-color (rand-int 360)))))
 

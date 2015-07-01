@@ -1,6 +1,8 @@
 (ns mygnu.views
+  (:require-macros [cljs.core.async.macros :refer [go-loop go]])
   (:require [re-frame.core :as r]
             [reagent.core :as reagent]
+            [cljs.core.async :refer [<! chan sliding-buffer put! close! timeout]]
             [mygnu.style :as st]))
 
 (defn particle-view [c]
@@ -15,7 +17,10 @@
                   :origin-x (-> el .getBoundingClientRect .-left)
                   :origin-y (-> el .getBoundingClientRect .-top)
                   }]
-           (r/dispatch-sync [:add-particle p])))
+           (r/dispatch [:add-particle p])
+           (go
+             (<! (timeout (rand-int 1500)))
+             (r/dispatch-sync [:transition id :opacity 0 1 1500]))))
        :reagent-render
        (let [p (r/subscribe [:particle id])]
          (fn []
@@ -25,7 +30,7 @@
                            :display "inline-block"
                            :min-width ".475rem" ;; space chars
                            }}
-            (:char @p)]))})))
+            (or  (:char @p) c)]))})))
 
 (defn particles [s]
   [:div
@@ -35,7 +40,7 @@
   (let [s1 (seq "INTERACTIVE")
         s2 (seq "DESIGN & DEVELOPMENT")]
     (fn []
-      [:div.board {:on-mouse-move #(r/dispatch-sync [:handle-mouse-move %])}
+      [:div.board {:on-mouse-move #(r/dispatch-sync [:mouse-move %])}
        [:div.content {:style (st/content)}
         [:div {:style (st/headings)}
          (particles s1)

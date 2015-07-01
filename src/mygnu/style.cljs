@@ -32,7 +32,7 @@
      :position "relative"
      ;:top "45%"
      :top (rm (* lhs 8))
-     :color "hsla(0, 0%, 20%, 1)"}))
+     :color "hsla(0, 0%, 30%, 1)"}))
 
 (defn headings []
   (pipe
