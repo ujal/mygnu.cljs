@@ -28,8 +28,7 @@
 
 (defn content []
   (pipe
-    {
-     :position "relative"
+    {:position "relative"
      :font-size (rm (* fs 2))
      :font-family "VT323"
      :line-height 1
