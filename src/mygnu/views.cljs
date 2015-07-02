@@ -3,6 +3,7 @@
   (:require [re-frame.core :as r]
             [reagent.core :as reagent]
             [cljs.core.async :refer [<! chan sliding-buffer put! close! timeout]]
+            [bardo.transition :refer [transition]]
             [mygnu.style :as st]))
 
 (defn particle-view [c]
@@ -17,10 +18,10 @@
                   :origin-x (-> el .getBoundingClientRect .-left)
                   :origin-y (-> el .getBoundingClientRect .-top)
                   }]
-           (r/dispatch [:add-particle p])
+           (r/dispatch-sync [:add-particle p])
            (go
              (<! (timeout (rand-int 1500)))
-             (r/dispatch-sync [:transition id :opacity 0 1 1500]))))
+             (r/dispatch-sync [:transition id {:opacity 0} {:opacity 1} 1500]))))
        :reagent-render
        (let [p (r/subscribe [:particle id])]
          (fn []
@@ -28,9 +29,13 @@
                            :opacity (or (:opacity @p) 0)
                            :transform "translateZ(0)"
                            :display "inline-block"
-                           :min-width ".475rem" ;; space chars
+                           :position "relative"
+                           :min-width "1.24688rem" ;; space chars
+                           :top (str (:top @p) "rem")
                            }}
-            (or  (:char @p) c)]))})))
+            (if (= (:opacity @p) 1)
+              (:char @p)
+              (rand-nth (map char (range 65 254))))]))})))
 
 (defn particles [s]
   [:div
@@ -45,7 +50,11 @@
         [:div {:style (st/headings)}
          (particles s1)
          (particles s2)]
+        [:ul {:style {:list-style "decimal outside none"}}
+         [:li [:a "ABOUT"]]
+         [:li [:a "TOOLS"]]
+         [:li [:a "WORK"]]]
         #_[:div {:style (st/board)}
-         (for [y (range 9)]
-           ^{:key y} [particles "XXXXXXXXXXXXXXXXXXXXXXXXXXX"])]]])))
+           (for [y (range 9)]
+             ^{:key y} [particles "XXXXXXXXXXXXXXXXXXXXXXXXXXX"])]]])))
 

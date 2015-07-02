@@ -35,12 +35,11 @@
 (r/register-handler
  :add-particle
  (fn  [state [_ {:keys [id] :as p}]]
+   ;(println (count (:particle-list state)))
    (assoc-in state [:particle-list id] p)))
 
 (defn update-char [state]
   (let [rid (rand-nth (keys (:particle-list state)))]
-    ;(assoc-in state [:particle-list rid :char] (first (shuffle [\I \N \T])))))
-    ;(assoc-in state [:particle-list rid :char] (rand-nth (map char (range 97 123))))))
     (assoc-in state [:particle-list rid :char] (rand-nth (map char (range 65 90))))))
 
 (defn update-color [state e]
@@ -52,25 +51,27 @@
                    "%, 1)"))))
 
 (r/register-handler
- :transition-callback
- (fn [state [_ id k v]]
-   (assoc-in state [:particle-list id k] v)))
+ :update-particle
+ (fn  [state [_ id m]]
+   (update-in state [:particle-list id] #(conj % m))))
 
 (r/register-handler
  :transition
- (fn [state [_ id k from to duration]]
-   (let [ch (transition from to {:duration duration})]
+ (fn [state [_ id from to duration]]
+   (let [ch (transition (into {} from) (into {} to) {:duration duration})]
      (go-loop []
-              (when-let [v (<! ch)]
-                (r/dispatch-sync [:transition-callback id k v])
+              (when-let [m (<! ch)]
+                (r/dispatch-sync [:update-particle id m])
                 (recur)))
      state)))
 
 (r/register-handler
  :mouse-move
  (fn [state [_ e]]
+   (r/dispatch [:transition (rand-nth (keys (:particle-list state)))
+                {:opacity 0} {:opacity 1} 1500])
    (-> state
-       (update-color e))))
+       #_(update-color e))))
 
 (r/register-handler
   :time-update

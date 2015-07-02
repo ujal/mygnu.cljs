@@ -28,18 +28,20 @@
 
 (defn content []
   (pipe
-    {:transform "translateY(-50%)"
+    {
      :position "relative"
+     :font-size (rm (* fs 2))
+     :font-family "VT323"
+     :line-height 1
      ;:top "45%"
-     :top (rm (* lhs 8))
+     :top (rm (* lhs 5))
      :color "hsla(0, 0%, 30%, 1)"}))
 
 (defn headings []
-  (pipe
-    {:font-size (rm (* fs 1.4))
-     :font-family "Montserrat"
-     :font-weight "bold"
-     :margin-bottom (rm (* lhs 3))}))
+  (pipe {:font-size (rm (* fs 2))
+         :font-family "VT323"
+         :line-height 1
+         :margin-bottom (rm (* lhs 1))}))
 
 (defn ul []
   (pipe
