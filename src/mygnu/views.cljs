@@ -20,25 +20,19 @@
                   :width (.-offsetWidth el) :height (.-offsetHeight el)
                   :origin-x (-> el .getBoundingClientRect .-left)
                   :origin-y (-> el .getBoundingClientRect .-top)}]
-           (r/dispatch-sync [:add-particle p])
-
-           (go
-             (<! (timeout (rand-int 1500)))
-             (r/dispatch [:transition id {:opacity 0} {:opacity 1} 1500]))))
+           (r/dispatch-sync [:add-particle p])))
        :reagent-render
        (let [p (r/subscribe [:particle id])
              cs (map char (range 65 254))]
          (fn []
            [:span {:style {:color (:color @p)
-                           :opacity (or (:opacity @p) 0)
+                           :opacity (or (:opacity @p) 1)
                            :transform "translateZ(0)"
                            :display "inline-block"
                            :position "relative"
                            :min-width "1.24688rem" ;; space chars
                            }}
-            (if (= (:opacity @p) 1)
-              (:char @p)
-              (rand-nth cs))]))})))
+            (:char @p)]))})))
 
 (defn particles [s]
   [:div

@@ -35,12 +35,16 @@
 (r/register-handler
  :add-particle
  (fn  [state [_ {:keys [id] :as p}]]
-   ;(println (count (:particle-list state)))
    (assoc-in state [:particle-list id] p)))
 
 (defn update-char [state]
-  (let [rid (rand-nth (keys (:particle-list state)))]
-    (assoc-in state [:particle-list rid :char] (rand-nth (map char (range 65 90))))))
+  (let [rid (rand-nth (keys (:particle-list state)))
+        cs (map char (range 128 254))]
+    ;(assoc-in state [:particle-list rid :char] (rand-nth cs))))
+    (assoc-in state [:particle-list]
+              (into {} (for [[k v] (:particle-list state)]
+                         (vector k (conj v {:char (rand-nth cs)})))))))
+
 
 (defn update-color [state e]
   (let [rid (rand-nth (keys (:particle-list state)))]
@@ -68,7 +72,7 @@
 (r/register-handler
  :mouse-move
  (fn [state [_ e]]
-   (r/dispatch [:transition (rand-nth (keys (:particle-list state)))
+   #_(r/dispatch [:transition (rand-nth (keys (:particle-list state)))
                 {:opacity 0} {:opacity 1} 1500])
    (-> state
        #_(update-color e))))
@@ -77,5 +81,6 @@
   :time-update
   (fn [state [_ t]]
     (-> state
-        (update-color (rand-int 360)))))
+        #_(update-color (rand-int 360))
+        #_(update-char))))
 

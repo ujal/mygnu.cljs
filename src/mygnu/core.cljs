@@ -33,7 +33,7 @@
 (defn ^:export init []
   (r/dispatch-sync [:initialize-db])
   (mount-root)
-  #_(update!))
+  (update!))
 
 
 
