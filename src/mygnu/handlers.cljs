@@ -40,10 +40,7 @@
 (defn update-char [state]
   (let [rid (rand-nth (keys (:particle-list state)))
         cs (map char (range 128 254))]
-    ;(assoc-in state [:particle-list rid :char] (rand-nth cs))))
-    (assoc-in state [:particle-list]
-              (into {} (for [[k v] (:particle-list state)]
-                         (vector k (conj v {:char (rand-nth cs)})))))))
+    (assoc-in state [:particle-list rid :char] (rand-nth cs))))
 
 
 (defn update-color [state e]
@@ -72,15 +69,17 @@
 (r/register-handler
  :mouse-move
  (fn [state [_ e]]
-   #_(r/dispatch [:transition (rand-nth (keys (:particle-list state)))
+   (r/dispatch [:transition (rand-nth (keys (:particle-list state)))
                 {:opacity 0} {:opacity 1} 1500])
+   (time
    (-> state
-       #_(update-color e))))
+       (update-color e)
+       update-char))))
 
 (r/register-handler
   :time-update
   (fn [state [_ t]]
     (-> state
         #_(update-color (rand-int 360))
-        #_(update-char))))
+        #_update-char)))
 

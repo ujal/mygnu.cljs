@@ -51,7 +51,6 @@
          (particles s2)]
         #_[:ul {:style {:list-style "decimal outside none" :color "#1EAEDB"}}
          (map (fn [n h]
-                (println h)
                 ^{:key h} [:li [:a {:style {:color (str "hsla(" h " , 76%, 49%, 1)")}} n]])
               navs h)]]])))
 
