@@ -56,6 +56,7 @@
  (fn  [state [_ id m]]
    (update-in state [:particle-list id] #(conj % m))))
 
+;TODO: make a function below and above - do not dispatch…
 (r/register-handler
  :transition
  (fn [state [_ id from to duration]]
@@ -67,14 +68,14 @@
      state)))
 
 (r/register-handler
- :mouse-move
- (fn [state [_ e]]
-   (r/dispatch [:transition (rand-nth (keys (:particle-list state)))
-                {:opacity 0} {:opacity 1} 1500])
-   (time
-   (-> state
-       (update-color e)
-       update-char))))
+  :mouse-move
+  (fn [state [_ e]]
+    (r/dispatch [:transition (rand-nth (keys (:particle-list state)))
+                 {:opacity 0} {:opacity 1} 1500])
+    (time
+      (-> state
+          (update-color e)
+          update-char))))
 
 (r/register-handler
   :time-update
