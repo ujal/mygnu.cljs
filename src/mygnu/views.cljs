@@ -34,23 +34,34 @@
                            }}
             (:char @p)]))})))
 
-(defn particles [s]
-  [:div
-   (map-indexed (fn [i c] ^{:key i} [particle-view c]) s)])
+(defn nav-item [item h] ^{:key h}
+  [:li {:style {:display "inline-block"
+                :margin-right (str (* 1.5 1.6) "rem")}}
+   [:a {:style { :color (str "hsla(0, 0%, " h "%, 1)")}}
+    item]])
+
+(defn nav []
+  (let [list ["ABOUT" "TOOLS" "WORK"]
+        hues [30 40 50]]
+    [:ul {:style {:list-style "decimal outside none"
+                  :color "#1EAEDB"}}
+     (map nav-item list hues)]))
+
+(defn header []
+  [:div {:style (st/headings)}
+   [:span (map-indexed (fn [i c] ^{:key i} [particle-view c]) "INTERACTIVE ")]
+   [:span (map-indexed (fn [i c] ^{:key i} [particle-view c]) "DESIGN & DEVELOPMENT")]])
 
 (defn main-view []
-  (let [s1 (seq "INTERACTIVE")
-        s2 (seq "DESIGN & DEVELOPMENT")
-        navs ["ABOUT" "TOOLS" "WORK"]
-        h [20 194 300]]
-    (fn []
-      [:div.board {:on-mouse-move #(r/dispatch-sync [:mouse-move %])}
-       [:div.content {:style (st/content)}
-        [:div {:style (st/headings)}
-         (particles s1)
-         (particles s2)]
-        #_[:ul {:style {:list-style "decimal outside none" :color "#1EAEDB"}}
-         (map (fn [n h]
-                ^{:key h} [:li [:a {:style {:color (str "hsla(" h " , 76%, 49%, 1)")}} n]])
-              navs h)]]])))
+  (fn []
+    [:div.board {:on-mouse-move #(r/dispatch-sync [:mouse-move %])}
+     [:div.content {:style (st/content)}
+      [header]
+      [:div {:style (st/logo)}
+       "*"]
+      [nav]
+      [:div {:style (st/page)}
+       [:div "HELLO, MY NAME IS UDSCHAL."]
+       [:div "I'm a front-end developer from Cologne,Germany."]
+       [:div "Currently crafting keyput.com"]]]]))
 

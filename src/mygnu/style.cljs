@@ -33,35 +33,27 @@
      :font-family "VT323"
      :line-height 1
      ;:top "45%"
-     :top (rm (* lhs 5))
+     ;:top (rm (* lhs 5))
+     :height "100%"
      :color "hsla(0, 0%, 30%, 1)"}))
 
 (defn headings []
   (pipe {:font-size (rm (* fs 2))
          :font-family "VT323"
          :line-height 1
-         :margin-bottom (rm (* lhs 1))}))
+         :top (rm (* lhs 1))
+         :position "relative"
+         :margin-bottom (rm (* lhs 3))}))
 
-(defn ul []
+(defn logo []
   (pipe
-    {:list-style "none"
-     :margin "1.2rem"}))
+    {:fontSize "8rem"
+     :transform "rotate(-45deg)"}))
 
-(defn li []
+(defn page []
   (pipe
-    {:list-style "none"
-     :margin "1.2rem"
-     :display "inline"}))
-
-(defn mcoords []
-  (pipe
-    {:list-style "none"
-     :display "inline"}))
-
-(defn board []
-  (pipe
-    {:font-size (rm (* fs 1.4))
-     ;:font-family "VT323"
-     :font-weight "normal"
-     :margin "2rem"}))
+    {:fontSize "2.4rem"
+     :fontWidth "700"
+     :margin-top "4.8rem"
+     :line-height (/ lh 1)}))
 
