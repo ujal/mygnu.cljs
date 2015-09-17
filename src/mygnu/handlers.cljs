@@ -1,5 +1,6 @@
 (ns mygnu.handlers
-  (:require-macros [cljs.core.async.macros :refer [go-loop go]])
+  (:require-macros [cljs.core.async.macros :refer [go-loop go]]
+                   [mygnu.macros :refer [timep]])
   (:require [re-frame.core :as r]
             [mygnu.db :as db]
             [cljs.core.async :refer [<! chan sliding-buffer put! close! timeout]]
@@ -56,28 +57,34 @@
   (fn  [state [_ id m]]
     (update-in state [:particle-list id] #(conj % m))))
 
-;TODO: make a function below and above - do not dispatch…
-(r/register-handler
-  :transition
-  (fn [state [_ id from to duration]]
-    (let [ch (transition (into {} from) (into {} to) {:duration duration})]
-      (go-loop []
-               (when-let [m (<! ch)]
-                 (pr m)
-                 (r/dispatch-sync [:update-particle id m])
-                 (recur)))
-      state)))
+(defn throttle [c ms]
+  (let [c' (chan)]
+    (go
+      (while true
+        (>! c' (<! c))
+        (<! (timeout ms))))
+    c'))
+
+(defn transition-fn [state id from to duration]
+  (let [ch (transition from to {:duration duration})]
+    (go-loop []
+             (when-let [m (<! ch)]
+               (r/dispatch-sync [:update-particle id m])
+               (recur)))
+    state))
 
 (r/register-handler
   :mouse-move
   (fn [state [_ e]]
-    (r/dispatch [:transition (rand-nth (keys (:particle-list state)))
-                 {:opacity 0} {:opacity 1} 1500])
-
-    (time
-      (-> state
-          #_(update-color e)
-          #_update-char))))
+    (when (= (mod (.-clientX e) 7) 0)
+      (transition-fn state
+                     (rand-nth (keys (:particle-list state)))
+                     {:opacity 0}
+                     {:opacity 1}
+                     1600))
+    (-> state
+        #_(update-color e)
+        #_update-char)))
 
 (r/register-handler
   :time-update

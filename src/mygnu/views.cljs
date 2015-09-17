@@ -1,5 +1,6 @@
 (ns mygnu.views
-  (:require-macros [cljs.core.async.macros :refer [go-loop go]])
+  (:require-macros [cljs.core.async.macros :refer [go-loop go]]
+                   [mygnu.macros :refer [timep]])
   (:require [re-frame.core :as r]
             [reagent.core :as reagent]
             [cljs.core.async :refer [<! chan sliding-buffer put! close! timeout]]
@@ -25,9 +26,7 @@
        (let [p (r/subscribe [:particle id])
              cs (map char (range 128 254))]
          (fn []
-           [:span {:style {:color  (if (< (or (:opacity @p) 1) 1)
-                                                (:color @p)
-                                                "hsla(0,0%,30%,1)")
+           [:span {:style {:color (:color @p)
                            :opacity (or (:opacity @p) 1)
                            :transform "translateZ(0)"
                            :display "inline-block"
