@@ -15,7 +15,6 @@
 
 (defn time-loop [time]
   (r/dispatch [:time-update time])
-  ;(when (:hover new-state)
   (when true
     (go
       ;(<! (timeout 250))

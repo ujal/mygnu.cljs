@@ -28,9 +28,9 @@
   (.getTime (js/Date.)))
 
 (r/register-handler
- :initialize-db
- (fn  [_ _]
-   db/default-db))
+  :initialize-db
+  (fn  [_ _]
+    db/default-db))
 
 (r/register-handler
  :add-particle
@@ -52,30 +52,32 @@
                    "%, 1)"))))
 
 (r/register-handler
- :update-particle
- (fn  [state [_ id m]]
-   (update-in state [:particle-list id] #(conj % m))))
+  :update-particle
+  (fn  [state [_ id m]]
+    (update-in state [:particle-list id] #(conj % m))))
 
 ;TODO: make a function below and above - do not dispatch…
 (r/register-handler
- :transition
- (fn [state [_ id from to duration]]
-   (let [ch (transition (into {} from) (into {} to) {:duration duration})]
-     (go-loop []
-              (when-let [m (<! ch)]
-                (r/dispatch-sync [:update-particle id m])
-                (recur)))
-     state)))
+  :transition
+  (fn [state [_ id from to duration]]
+    (let [ch (transition (into {} from) (into {} to) {:duration duration})]
+      (go-loop []
+               (when-let [m (<! ch)]
+                 (pr m)
+                 (r/dispatch-sync [:update-particle id m])
+                 (recur)))
+      state)))
 
 (r/register-handler
   :mouse-move
   (fn [state [_ e]]
     (r/dispatch [:transition (rand-nth (keys (:particle-list state)))
                  {:opacity 0} {:opacity 1} 1500])
+
     (time
       (-> state
-          (update-color e)
-          update-char))))
+          #_(update-color e)
+          #_update-char))))
 
 (r/register-handler
   :time-update

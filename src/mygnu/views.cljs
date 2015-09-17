@@ -23,16 +23,20 @@
            (r/dispatch-sync [:add-particle p])))
        :reagent-render
        (let [p (r/subscribe [:particle id])
-             cs (map char (range 65 254))]
+             cs (map char (range 128 254))]
          (fn []
-           [:span {:style {:color (:color @p)
+           [:span {:style {:color  (if (< (or (:opacity @p) 1) 1)
+                                                (:color @p)
+                                                "hsla(0,0%,30%,1)")
                            :opacity (or (:opacity @p) 1)
                            :transform "translateZ(0)"
                            :display "inline-block"
                            :position "relative"
                            :min-width "1.24688rem" ;; space chars
                            }}
-            (:char @p)]))})))
+            (if (< (or (:opacity @p) 1) 1)
+              (rand-nth cs)
+              (:char @p))]))})))
 
 (defn nav-item [item h] ^{:key h}
   [:li {:style {:display "inline-block"
@@ -62,6 +66,6 @@
       [nav]
       [:div {:style (st/page)}
        [:div "HELLO, MY NAME IS UDSCHAL."]
-       [:div "I'm a front-end developer from Cologne,Germany."]
+       [:div "I'm a front-end developer from Cologne, Germany."]
        [:div "Currently crafting keyput.com"]]]]))
 

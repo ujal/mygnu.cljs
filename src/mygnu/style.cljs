@@ -48,7 +48,8 @@
 (defn logo []
   (pipe
     {:fontSize "8rem"
-     :transform "rotate(-45deg)"}))
+     :transform "rotate(-45deg)"
+     :display "inline-block"}))
 
 (defn page []
   (pipe
