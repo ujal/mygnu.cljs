@@ -57,14 +57,6 @@
   (fn  [state [_ id m]]
     (update-in state [:particle-list id] #(conj % m))))
 
-(defn throttle [c ms]
-  (let [c' (chan)]
-    (go
-      (while true
-        (>! c' (<! c))
-        (<! (timeout ms))))
-    c'))
-
 (defn transition-fn [state id from to duration]
   (let [ch (transition from to {:duration duration})]
     (go-loop []
