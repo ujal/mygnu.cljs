@@ -2,4 +2,5 @@
 
 (def default-db
   {:start 0
-   :particle-list {}})
+   :particle-list {}
+   :page-particles []})

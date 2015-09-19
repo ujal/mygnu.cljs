@@ -10,29 +10,33 @@
 (defn now []
   (.getTime (js/Date.)))
 
-(defn particle-view [c]
+(defn particle-view [c t]
   (let [id (gensym)]
     (reagent/create-class
       {:component-did-mount
        (fn [this]
          (let [el (reagent/dom-node this)
                p {:id id
+                  :type t
                   :char c
                   :width (.-offsetWidth el) :height (.-offsetHeight el)
                   :origin-x (-> el .getBoundingClientRect .-left)
                   :origin-y (-> el .getBoundingClientRect .-top)}]
-           (r/dispatch-sync [:add-particle p])))
+           (r/dispatch-sync [:add-particle p])
+           #_(r/dispatch-sync [:particle-did-mount id char type])))
        :reagent-render
-       (let [p (r/subscribe [:particle id])
+       (let [p (if (= t :heading)
+                 (r/subscribe [:particle id])
+                 (r/subscribe [:page-particle id]))
              cs (map char (range 128 254))]
          (fn []
+           (when (= t :page) 
+             (pr (:char @p)))
            [:span {:style {:color (:color @p)
                            :opacity (or (:opacity @p) 1)
-                           :transform "translateZ(0)"
                            :display "inline-block"
                            :position "relative"
-                           :min-width "1.24688rem" ;; space chars
-                           }}
+                           :min-width "1.24688rem"}}
             (if (< (or (:opacity @p) 1) 1)
               (rand-nth cs)
               (:char @p))]))})))
@@ -46,14 +50,16 @@
 (defn nav []
   (let [list ["ABOUT" "TOOLS" "WORK"]
         hues [30 40 50]]
-    [:ul {:style {:list-style "decimal outside none"
+    [:ul {:on-mouse-move #(r/dispatch-sync [:nav-mouse-move %])
+          :on-mouse-out #(r/dispatch-sync [:nav-mouse-out %])
+          :style {:list-style "decimal outside none"
                   :color "#1EAEDB"}}
      (map nav-item list hues)]))
 
 (defn header []
   [:div {:style (st/headings)}
-   [:span (map-indexed (fn [i c] ^{:key i} [particle-view c]) "INTERACTIVE ")]
-   [:span (map-indexed (fn [i c] ^{:key i} [particle-view c]) "DESIGN & DEVELOPMENT")]])
+   [:span (map-indexed (fn [i c] ^{:key i} [particle-view c :heading]) "INTERACTIVE ")]
+   [:span (map-indexed (fn [i c] ^{:key i} [particle-view c :heading]) "DESIGN & DEVELOPMENT")]])
 
 (defn main-view []
   (fn []
@@ -64,7 +70,7 @@
        "*"]
       [nav]
       [:div {:style (st/page)}
-       [:div "HELLO, MY NAME IS UDSCHAL."]
+       [:div (map-indexed (fn [i c] ^{:key i} [particle-view c :page]) "HELLO, MY NAME IS UDSCHAL.")]
        [:div "I'm a front-end developer from Cologne, Germany."]
        [:div "Currently crafting keyput.com"]]]]))
 

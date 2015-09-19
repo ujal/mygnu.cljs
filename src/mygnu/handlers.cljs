@@ -36,13 +36,13 @@
 (r/register-handler
  :add-particle
  (fn  [state [_ {:keys [id] :as p}]]
-   (assoc-in state [:particle-list id] p)))
+   (if (= (:type p) :heading)
+     (assoc-in state [:particle-list id] p)
+     (update state :page-particles #(conj % p)))))
 
-(defn update-char [state]
-  (let [rid (rand-nth (keys (:particle-list state)))
-        cs (map char (range 128 254))]
-    (assoc-in state [:particle-list rid :char] (rand-nth cs))))
-
+(let [cs (map char (range 128 254))]
+  (defn update-char [state rid]
+    (assoc-in state [:particle-list rid :char-r] (rand-nth cs))))
 
 (defn update-color [state e]
   (let [rid (rand-nth (keys (:particle-list state)))]
@@ -55,7 +55,8 @@
 (r/register-handler
   :update-particle
   (fn  [state [_ id m]]
-    (update-in state [:particle-list id] #(conj % m))))
+    (-> state
+        (update-in [:particle-list id] #(conj % m)))))
 
 (defn transition-fn [state id from to duration]
   (let [ch (transition from to {:duration duration})]
@@ -78,10 +79,29 @@
         #_(update-color e)
         #_update-char)))
 
+(defn update-pos [state]
+  (let [rid (rand-nth (keys (:particle-list state)))
+        cs (map char (range 128 254))]
+    (assoc-in state [:page-particles] (rand-nth cs))))
+
+(r/register-handler
+  :nav-mouse-move
+  (fn [state [_ e]]
+    (-> state
+        (assoc :is-hover true)
+        (update :page-particles (fn [ps]
+                             (mapv #(assoc % :is-settled false) ps))))))
+
+
+(r/register-handler
+  :nav-mouse-out
+  (fn [state [_ e]]
+    (-> state
+        (assoc :is-hover false))))
+
 (r/register-handler
   :time-update
   (fn [state [_ t]]
     (-> state
-        #_(update-color (rand-int 360))
-        #_update-char)))
+        #_update-pos)))
 
