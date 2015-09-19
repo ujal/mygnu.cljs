@@ -10,28 +10,18 @@
 (defn now []
   (.getTime (js/Date.)))
 
-(defn particle-view [c t]
+(defn particle-view [c type]
   (let [id (gensym)]
     (reagent/create-class
       {:component-did-mount
        (fn [this]
-         (let [el (reagent/dom-node this)
-               p {:id id
-                  :type t
-                  :char c
-                  :width (.-offsetWidth el) :height (.-offsetHeight el)
-                  :origin-x (-> el .getBoundingClientRect .-left)
-                  :origin-y (-> el .getBoundingClientRect .-top)}]
-           (r/dispatch-sync [:add-particle p])
-           #_(r/dispatch-sync [:particle-did-mount id char type])))
+         (r/dispatch-sync [:particle-did-mount id c type this]))
        :reagent-render
-       (let [p (if (= t :heading)
+       (let [p (if (= type :heading)
                  (r/subscribe [:particle id])
                  (r/subscribe [:page-particle id]))
              cs (map char (range 128 254))]
          (fn []
-           (when (= t :page) 
-             (pr (:char @p)))
            [:span {:style {:color (:color @p)
                            :opacity (or (:opacity @p) 1)
                            :display "inline-block"

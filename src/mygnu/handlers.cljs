@@ -4,7 +4,8 @@
   (:require [re-frame.core :as r]
             [mygnu.db :as db]
             [cljs.core.async :refer [<! chan sliding-buffer put! close! timeout]]
-            [bardo.transition :refer [transition]]))
+            [bardo.transition :refer [transition]]
+            [reagent.core :as reagent]))
 
 (def content
   [["INTERACTIVE"]
@@ -12,7 +13,7 @@
    ["ABOUT PROJECTS TOOLS"]
    ["Hi, my name is Ujjal"]])
 
-(defn new-particle [id type char]
+(defn new-particle [id char type el]
   {:id id
    :char char
    :type type
@@ -20,10 +21,9 @@
    :y 0
    :vx 0
    :vy 0
-   :width nil
-   :height nil
-   :origin-x nil
-   :origin-y nil})
+   :width (.-offsetWidth el) :height (.-offsetHeight el)
+   :origin-x (-> el .getBoundingClientRect .-left)
+   :origin-y (-> el .getBoundingClientRect .-top)})
 
 (defn now []
   (.getTime (js/Date.)))
@@ -33,12 +33,20 @@
   (fn  [_ _]
     db/default-db))
 
+(defn add-header-particle [state {:keys [id] :as p}]
+  (assoc-in state [:particle-list id] p))
+
+(defn add-page-particle [state p]
+  (update state :page-particles #(conj % p)))
+
 (r/register-handler
- :add-particle
- (fn  [state [_ {:keys [id] :as p}]]
-   (if (= (:type p) :heading)
-     (assoc-in state [:particle-list id] p)
-     (update state :page-particles #(conj % p)))))
+ :particle-did-mount
+ (fn  [state [_ id char type comp]]
+   (let [el (reagent/dom-node comp)
+         p (new-particle id char type el)]
+     (-> state
+         (add-header-particle p)
+         (add-page-particle p)))))
 
 (let [cs (map char (range 128 254))]
   (defn update-char [state rid]
@@ -90,7 +98,7 @@
     (-> state
         (assoc :is-hover true)
         (update :page-particles (fn [ps]
-                             (mapv #(assoc % :is-settled false) ps))))))
+                                  (mapv #(assoc % :is-settled false) ps))))))
 
 
 (r/register-handler
