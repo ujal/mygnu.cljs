@@ -18,7 +18,7 @@
          (r/dispatch-sync [:particle-did-mount id c type this]))
        :reagent-render
        (let [p (if (= type :heading)
-                 (r/subscribe [:particle id])
+                 (r/subscribe [:header-particle id])
                  (r/subscribe [:page-particle id]))
              cs (map char (range 128 254))]
          (fn []

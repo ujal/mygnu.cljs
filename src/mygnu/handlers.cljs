@@ -34,7 +34,7 @@
     db/default-db))
 
 (defn add-header-particle [state {:keys [id] :as p}]
-  (assoc-in state [:particle-list id] p))
+  (assoc-in state [:header-particles id] p))
 
 (defn add-page-particle [state p]
   (update state :page-particles #(conj % p)))
@@ -50,12 +50,12 @@
 
 (let [cs (map char (range 128 254))]
   (defn update-char [state rid]
-    (assoc-in state [:particle-list rid :char-r] (rand-nth cs))))
+    (assoc-in state [:header-particles rid :char-r] (rand-nth cs))))
 
 (defn update-color [state e]
-  (let [rid (rand-nth (keys (:particle-list state)))]
+  (let [rid (rand-nth (keys (:header-particles state)))]
     (assoc-in state
-              [:particle-list rid :color]
+              [:header-particles rid :color]
               (str "hsla(" "0, 0%,"
                    (min 80 (max 30 (mod e.clientX 100)))
                    "%, 1)"))))
@@ -64,7 +64,7 @@
   :update-particle
   (fn  [state [_ id m]]
     (-> state
-        (update-in [:particle-list id] #(conj % m)))))
+        (update-in [:header-particles id] #(conj % m)))))
 
 (defn transition-fn [state id from to duration]
   (let [ch (transition from to {:duration duration})]
@@ -79,7 +79,7 @@
   (fn [state [_ e]]
     (when (= (mod (.-clientX e) 7) 0)
       (transition-fn state
-                     (rand-nth (keys (:particle-list state)))
+                     (rand-nth (keys (:header-particles state)))
                      {:opacity 0}
                      {:opacity 1}
                      1600))
@@ -88,7 +88,7 @@
         #_update-char)))
 
 (defn update-pos [state]
-  (let [rid (rand-nth (keys (:particle-list state)))
+  (let [rid (rand-nth (keys (:header-particles state)))
         cs (map char (range 128 254))]
     (assoc-in state [:page-particles] (rand-nth cs))))
 

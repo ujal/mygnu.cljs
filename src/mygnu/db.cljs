@@ -2,5 +2,5 @@
 
 (def default-db
   {:start 0
-   :particle-list {}
+   :header-particles {}
    :page-particles []})

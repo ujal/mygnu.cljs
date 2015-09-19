@@ -9,14 +9,14 @@
    (reaction (:mouse @db))))
 
 (r/register-sub
- :particle-list
+ :header-particles
  (fn [db]
-   (:particle-list @db)))
+   (:header-particles @db)))
 
 (r/register-sub
-  :particle
+  :header-particle
   (fn [db [_ id]]
-    (reaction (-> @db :particle-list id))))
+    (reaction (-> @db :header-particles id))))
 
 (r/register-sub
   :page-particle
