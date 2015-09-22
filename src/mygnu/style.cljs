@@ -31,6 +31,7 @@
     {:position "relative"
      :font-size (rm (* fs 2))
      :font-family "VT323"
+     :font-weight "700"
      :line-height 1
      ;:top "45%"
      ;:top (rm (* lhs 5))
@@ -43,17 +44,50 @@
          :line-height 1
          :top (rm (* lhs 1))
          :position "relative"
-         :margin-bottom (rm (* lhs 3))}))
+         :margin-bottom (rm (* lhs 5))
+         :margin-left (rm lhs)
+         :margin-right (rm lhs)}))
 
 (defn logo []
   (pipe
-    {:fontSize "8rem"
-     :transform "rotate(-45deg)"}))
+    {:fontSize "7rem"
+     :fontFamily "Montserrat"
+     :fontWeight "400"
+     :transform "rotate(90deg)"
+     :display "inline-block"
+     ;:margin (rm (* lhs 1))
+     :margin 0
+     }))
+
+(defn nav []
+  (pipe
+    {:list-style "decimal outside none"
+     :color "#1EAEDB"
+     :margin (rm (* lhs 2))
+     :fontFamily "Montserrat"
+     :fontSize "2rem"
+     :fontWeight "700"}))
+
+(defn nav-item []
+  (pipe
+    {:display "inline-block"
+     :margin-right (str (* 1.5 1.6) "rem")
+     :margin-bottom 0
+     :vertical-align "middle"
+     :line-height lh}))
 
 (defn page []
   (pipe
-    {:fontSize "2.4rem"
-     :fontWidth "700"
-     :margin-top "4.8rem"
-     :line-height (/ lh 1)}))
+    {:fontSize (rm (* fs 1.5))
+     :margin (rm (* lhs 2))
+     :line-height lh}))
+
+(defn footer []
+  (pipe
+    {:fontSize "2rem"
+     :line-height lh
+     :position "absolute"
+     :bottom 0
+     :marginBottom (rm lhs)
+     :left 0 :right 0}))
 

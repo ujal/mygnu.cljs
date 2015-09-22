@@ -15,8 +15,8 @@
                  [bardo "0.1.1-SNAPSHOT"]
                  [binaryage/devtools "0.3.0"]]
 
-  :plugins [[lein-cljsbuild "1.0.5"]
-            [lein-figwheel "0.3.3"]]
+  :plugins [[lein-cljsbuild "1.0.6"]
+            [lein-figwheel "0.3.9"]]
 
   :source-paths ["src"]
 

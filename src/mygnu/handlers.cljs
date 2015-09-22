@@ -7,21 +7,16 @@
             [bardo.transition :refer [transition]]
             [reagent.core :as reagent]))
 
-(def content
-  [["INTERACTIVE"]
-   ["DESIGN & DEVELOPMENT"]
-   ["ABOUT PROJECTS TOOLS"]
-   ["Hi, my name is Ujjal"]])
-
 (defn new-particle [id char type el]
   {:id id
    :char char
    :type type
-   :x 0
-   :y 0
-   :vx 0
-   :vy 0
-   :width (.-offsetWidth el) :height (.-offsetHeight el)
+   :x nil
+   :y nil
+   :vx nil
+   :vy nil
+   :width (.-offsetWidth el)
+   :height (.-offsetHeight el)
    :origin-x (-> el .getBoundingClientRect .-left)
    :origin-y (-> el .getBoundingClientRect .-top)})
 
@@ -39,14 +34,22 @@
 (defn add-page-particle [state p]
   (update state :page-particles #(conj % p)))
 
+(defn add-contact-particle [state {:keys [id] :as p}]
+  (assoc-in state [:contact-particles id] p))
+
+(defn add-logo-s-particle [state {:keys [id] :as p}]
+  (assoc-in state [:logo-s-particles id] p))
+
 (r/register-handler
- :particle-did-mount
- (fn  [state [_ id char type comp]]
-   (let [el (reagent/dom-node comp)
-         p (new-particle id char type el)]
-     (-> state
-         (add-header-particle p)
-         (add-page-particle p)))))
+  :particle-did-mount
+  (fn  [state [_ id char type comp]]
+    (let [el (reagent/dom-node comp)
+          p (new-particle id char type el)]
+      (case type
+        :heading (add-header-particle state p)
+        :page    (add-page-particle state p)
+        :contact (add-contact-particle state p)
+        :logo-s  (add-logo-s-particle state p)))))
 
 (let [cs (map char (range 128 254))]
   (defn update-char [state rid]
@@ -60,32 +63,58 @@
                    (min 80 (max 30 (mod e.clientX 100)))
                    "%, 1)"))))
 
+(defn update-logo-s [state e]
+  (let [rid (rand-nth (keys (:logo-s-particles state)))]
+    (assoc-in state
+              [:logo-s-particles rid :color]
+              ;(str "hsla(360, 59%," (min 54 (max 50 (mod e.clientX 100))) "%, 1)"))))
+              (str "hsla(360, "(min 50 (max 20 (mod e.clientX 100)))"%, 54%, 1)"))))
+
 (r/register-handler
   :update-particle
   (fn  [state [_ id m]]
     (-> state
         (update-in [:header-particles id] #(conj % m)))))
 
-(defn transition-fn [state id from to duration]
+
+(r/register-handler
+  :update-logo-s-particle
+  (fn  [state [_ id m]]
+    (-> state
+        (update-in [:logo-s-particles id] #(conj % m)))))
+
+(defn transition-fn [state id from to duration type]
   (let [ch (transition from to {:duration duration})]
     (go-loop []
              (when-let [m (<! ch)]
-               (r/dispatch-sync [:update-particle id m])
+               (case type
+                 :heading (r/dispatch-sync [:update-particle id m])
+                 :logo-s (r/dispatch-sync [:update-logo-s-particle id m]))
                (recur)))
     state))
 
 (r/register-handler
   :mouse-move
   (fn [state [_ e]]
-    (when (= (mod (.-clientX e) 7) 0)
-      (transition-fn state
-                     (rand-nth (keys (:header-particles state)))
-                     {:opacity 0}
-                     {:opacity 1}
-                     1600))
-    (-> state
-        #_(update-color e)
-        #_update-char)))
+    (let [modulo (mod (.-clientX e) 7)]
+      (cond
+        (= modulo 0) (-> state
+                         (transition-fn
+                           (rand-nth (keys (:header-particles state)))
+                           {:opacity 0}
+                           {:opacity 1}
+                           1600
+                           :heading)
+                         (transition-fn
+                           (rand-nth (keys (:logo-s-particles state)))
+                           {:opacity 0}
+                           {:opacity 1}
+                           3600
+                           :logo-s)
+                         #_(update-color e)
+                         #_update-char)
+         (> modulo 0) (-> state
+                          #_(update-logo-s e))))))
 
 (defn update-pos [state]
   (let [rid (rand-nth (keys (:header-particles state)))

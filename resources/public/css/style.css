@@ -2,7 +2,6 @@
 @import '../bower_components/skeleton/css/skeleton.css';
 
 @import url(http://fonts.googleapis.com/css?family=Montserrat:400,700);
-@import url(http://fonts.googleapis.com/css?family=Vollkorn:400italic,700italic,400,700);
 @import url(http://fonts.googleapis.com/css?family=VT323);
 
 body, html, #app, .board {

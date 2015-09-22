@@ -22,3 +22,13 @@
   :page-particle
   (fn [db [_ id]]
     (reaction (first (filter #(= (:id %) id) (:page-particles @db))))))
+
+(r/register-sub
+  :contact-particle
+  (fn [db [_ id]]
+    (reaction (-> @db :contact-particles id))))
+
+(r/register-sub
+  :logo-s-particle
+  (fn [db [_ id]]
+    (reaction (-> @db :logo-s-particles id))))
