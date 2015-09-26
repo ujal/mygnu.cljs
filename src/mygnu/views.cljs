@@ -10,45 +10,46 @@
 (defn now []
   (.getTime (js/Date.)))
 
-(defn particle-view [c type]
-  (let [id (gensym)]
-    (reagent/create-class
-      {:component-did-mount
-       (fn [this]
-         (r/dispatch-sync [:particle-did-mount id c type this]))
-       :reagent-render
-       (let [p (case type
-                 :heading (r/subscribe [:header-particle id])
-                 :page (r/subscribe [:page-particle id])
-                 :contact (r/subscribe [:contact-particle id])
-                 :logo-s (r/subscribe [:logo-s-particle id]))
-             cs (map char (range 128 254))]
-         (fn []
-           (let [opacity (or (:opacity @p) 1)]
-             [:span {:style {:color (:color @p)
-                             :opacity opacity
-                             :display "inline-block"
-                             :position "relative"
-                             :min-width (if (= type :heading)
-                                          "1.24688rem"
-                                          "0.998438rem")}}
-              (if (< opacity 1)
-                (rand-nth cs)
-                (:char @p))])))})))
+(let [uid (atom 0)]
+  (defn particle-view [c type]
+    (let [id (keyword (str @uid))
+          _ (swap! uid inc)]
+      (reagent/create-class
+        {:component-did-mount
+         (fn [this]
+           (r/dispatch-sync [:particle-did-mount id c type this]))
+         :reagent-render
+         (let [p (r/subscribe [type id])
+               cs (map char (range 128 254))]
+           (fn []
+             (let [opacity (or (:opacity @p) 1)]
+               [:span {:style {:color (:color @p)
+                               :opacity opacity
+                               :display "inline-block"
+                               :position "relative"
+                               :min-width (if (= type :header-particle)
+                                            "1.24688rem"
+                                            "0.998438rem")}}
+                (if (< opacity 1)
+                  (rand-nth cs)
+                  (:char @p))])))}))))
 (defn header []
   [:div {:style (st/headings)}
-   [:span (map-indexed (fn [i c] ^{:key i} [particle-view c :heading]) "INTERACTIVE ")]
-   [:span (map-indexed (fn [i c] ^{:key i} [particle-view c :heading]) "DESIGN ")]
-   [:span (map-indexed (fn [i c] ^{:key i} [particle-view c :heading]) "& DEVELOPMENT")]])
+   [:span (map-indexed (fn [i c] ^{:key i} [particle-view c :header-particle]) "INTERACTIVE ")]
+   [:span (map-indexed (fn [i c] ^{:key i} [particle-view c :header-particle]) "DESIGN ")]
+   [:span (map-indexed (fn [i c] ^{:key i} [particle-view c :header-particle]) "& DEVELOPMENT")]])
 
 (defn nav-item [item h] ^{:key item}
   [:li {:style (st/nav-item)}
-   [:a {:style {:color (str "hsla(0, 0%," h "%, 1)")}}
+   [:a {:on-click #(r/dispatch-sync [:nav-item-click %])
+        :id item
+        :style (conj (st/nav-item-a)
+                     {:color (str "hsla(0, 0%," h "%, 1)")})}
     item]])
 
 (defn nav []
   (let [list ["ABOUT" "TOOLS" "WORK"]
-        hues [30 55 55]]
+        hues [30 50 50]]
     [:ul {:on-mouse-move #(r/dispatch-sync [:nav-mouse-move %])
           :on-mouse-out #(r/dispatch-sync [:nav-mouse-out %])
           :style (st/nav)}
@@ -56,14 +57,32 @@
 
 (defn footer []
   [:div {:style (st/footer)}
-   [:div {:style (conj (st/logo) {:fontSize "2rem"
-                                  :margin "0rem"})}
-           (map-indexed (fn [i c] ^{:key i} [particle-view c :logo-s]) "⦠")]
+   [:div {:style (conj (st/logo)
+                       {:fontSize "2rem"
+                        :margin "0rem"})}
+    (map-indexed (fn [i c] ^{:key i} [particle-view c :logo-s-particle]) "⦠")]
    [:div {:style {:fontFamily "Montserrat"
                   :fontSize "1.5rem"}}
-    (map-indexed (fn [i c] ^{:key i} [particle-view c :contact]) "CONTACT")]
+    "CONTACT"]
    [:div {:style {:fontSize "1.8rem"}}
     "udschal.imanov@gmail.com"]])
+
+(defn page []
+  (let [page (r/subscribe [:page-active])]
+    (fn []
+      [:div {:style (st/page)}
+       [:div {:style {:display (if (= @page "ABOUT") "block" "none")}}
+        [:div (map-indexed (fn [i c] ^{:key i} [particle-view c :page-particle]) "HELLO, MY NAME IS UDSCHAL.")]
+        [:div "I'm a front-end developer from Cologne, Germany."]
+        [:div "Currently crafting keyput.com"]]
+       [:div {:style {:display (if (= @page "TOOLS") "block" "none")}}
+        [:div "TOOLS"]
+        [:div "I'm a front-end developer from Cologne, Germany."]
+        [:div "Currently crafting keyput.com"]]
+       [:div {:style {:display (if (= @page "WORK") "block" "none")}}
+        [:div "WORK"]
+        [:div "I'm a front-end developer from Cologne, Germany."]
+        [:div "Currently crafting keyput.com"]]])))
 
 (defn main-view []
   (fn []
@@ -73,9 +92,6 @@
       [:div {:style (st/logo)}
        "⦠"]
       [nav]
-      [:div {:style (st/page)}
-       [:div (map-indexed (fn [i c] ^{:key i} [particle-view c :page]) "HELLO, MY NAME IS UDSCHAL.")]
-       [:div "I'm a front-end developer from Cologne, Germany."]
-       [:div "Currently crafting keyput.com"]]
+      [page]
       [footer]]]))
 

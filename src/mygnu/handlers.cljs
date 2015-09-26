@@ -28,28 +28,18 @@
   (fn  [_ _]
     db/default-db))
 
-(defn add-header-particle [state {:keys [id] :as p}]
-  (assoc-in state [:header-particles id] p))
-
-(defn add-page-particle [state p]
-  (update state :page-particles #(conj % p)))
-
-(defn add-contact-particle [state {:keys [id] :as p}]
-  (assoc-in state [:contact-particles id] p))
-
-(defn add-logo-s-particle [state {:keys [id] :as p}]
-  (assoc-in state [:logo-s-particles id] p))
+(defn add-particle [state type {:keys [id] :as p}]
+  (let [k (keyword (str (name type) "s"))]
+    (if (= k :page-particles)
+      (update state k #(conj % p))
+      (assoc-in state [k id] p))))
 
 (r/register-handler
   :particle-did-mount
   (fn  [state [_ id char type comp]]
     (let [el (reagent/dom-node comp)
           p (new-particle id char type el)]
-      (case type
-        :heading (add-header-particle state p)
-        :page    (add-page-particle state p)
-        :contact (add-contact-particle state p)
-        :logo-s  (add-logo-s-particle state p)))))
+      (add-particle state type p))))
 
 (let [cs (map char (range 128 254))]
   (defn update-char [state rid]
@@ -71,25 +61,23 @@
               (str "hsla(360, "(min 50 (max 20 (mod e.clientX 100)))"%, 54%, 1)"))))
 
 (r/register-handler
-  :update-particle
+  :update-heading
   (fn  [state [_ id m]]
     (-> state
         (update-in [:header-particles id] #(conj % m)))))
 
 
 (r/register-handler
-  :update-logo-s-particle
+  :update-logo-s
   (fn  [state [_ id m]]
     (-> state
         (update-in [:logo-s-particles id] #(conj % m)))))
 
-(defn transition-fn [state id from to duration type]
+(defn transition-fn [state id from to duration handlk]
   (let [ch (transition from to {:duration duration})]
     (go-loop []
              (when-let [m (<! ch)]
-               (case type
-                 :heading (r/dispatch-sync [:update-particle id m])
-                 :logo-s (r/dispatch-sync [:update-logo-s-particle id m]))
+               (r/dispatch-sync [handlk id m])
                (recur)))
     state))
 
@@ -104,22 +92,17 @@
                            {:opacity 0}
                            {:opacity 1}
                            1600
-                           :heading)
+                           :update-heading)
                          (transition-fn
                            (rand-nth (keys (:logo-s-particles state)))
                            {:opacity 0}
                            {:opacity 1}
                            3600
-                           :logo-s)
+                           :update-logo-s)
                          #_(update-color e)
                          #_update-char)
          (> modulo 0) (-> state
                           #_(update-logo-s e))))))
-
-(defn update-pos [state]
-  (let [rid (rand-nth (keys (:header-particles state)))
-        cs (map char (range 128 254))]
-    (assoc-in state [:page-particles] (rand-nth cs))))
 
 (r/register-handler
   :nav-mouse-move
@@ -137,8 +120,16 @@
         (assoc :is-hover false))))
 
 (r/register-handler
+  :nav-item-click
+  (fn [state [_ e]]
+    (let [page (-> e .-target .-id)]
+      (-> state
+          ;(page-fade-out (:page-active state))
+          (assoc :page-active page)))))
+
+(r/register-handler
   :time-update
   (fn [state [_ t]]
     (-> state
-        #_update-pos)))
+        )))
 

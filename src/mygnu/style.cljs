@@ -74,7 +74,15 @@
      :margin-right (str (* 1.5 1.6) "rem")
      :margin-bottom 0
      :vertical-align "middle"
-     :line-height lh}))
+     :cursor "pointer"
+     :line-height lh
+     :user-select "none"}))
+
+(defn nav-item-a []
+  (pipe
+    {:display "inline-block"
+     :line-height "3.2rem"
+     :user-select "none"}))
 
 (defn page []
   (pipe

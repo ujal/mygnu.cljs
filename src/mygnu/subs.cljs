@@ -9,11 +9,6 @@
    (reaction (:mouse @db))))
 
 (r/register-sub
- :header-particles
- (fn [db]
-   (:header-particles @db)))
-
-(r/register-sub
   :header-particle
   (fn [db [_ id]]
     (reaction (-> @db :header-particles id))))
@@ -24,11 +19,11 @@
     (reaction (first (filter #(= (:id %) id) (:page-particles @db))))))
 
 (r/register-sub
-  :contact-particle
-  (fn [db [_ id]]
-    (reaction (-> @db :contact-particles id))))
-
-(r/register-sub
   :logo-s-particle
   (fn [db [_ id]]
     (reaction (-> @db :logo-s-particles id))))
+
+(r/register-sub
+  :page-active
+  (fn [db [_]]
+    (reaction (-> @db :page-active))))

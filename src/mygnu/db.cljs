@@ -1,7 +1,8 @@
 (ns mygnu.db)
 
 (def default-db
-  {:start 0
+  {:page-active "ABOUT"}
+  #_{:page-active "ABOUT"
    :header-particles {}
    :page-particles []
    :contact-particles {}})
