@@ -27,7 +27,7 @@
                                :opacity opacity
                                :display "inline-block"
                                :position "relative"
-                               :min-width (if (= type :header-particle)
+                               :min-width (if (= type :heading)
                                             "1.24688rem"
                                             "0.998438rem")}}
                 (if (< opacity 1)
@@ -35,9 +35,9 @@
                   (:char @p))])))}))))
 (defn header []
   [:div {:style (st/headings)}
-   [:span (map-indexed (fn [i c] ^{:key i} [particle-view c :header-particle]) "INTERACTIVE ")]
-   [:span (map-indexed (fn [i c] ^{:key i} [particle-view c :header-particle]) "DESIGN ")]
-   [:span (map-indexed (fn [i c] ^{:key i} [particle-view c :header-particle]) "& DEVELOPMENT")]])
+   [:span (map-indexed (fn [i c] ^{:key i} [particle-view c :heading]) "INTERACTIVE ")]
+   [:span (map-indexed (fn [i c] ^{:key i} [particle-view c :heading]) "DESIGN ")]
+   [:span (map-indexed (fn [i c] ^{:key i} [particle-view c :heading]) "& DEVELOPMENT")]])
 
 (defn nav-item [item h] ^{:key item}
   [:li {:style (st/nav-item)}
@@ -60,7 +60,7 @@
    [:div {:style (conj (st/logo)
                        {:fontSize "2rem"
                         :margin "0rem"})}
-    (map-indexed (fn [i c] ^{:key i} [particle-view c :logo-s-particle]) "⦠")]
+    (map-indexed (fn [i c] ^{:key i} [particle-view c :logo-s]) "⦠")]
    [:div {:style {:fontFamily "Montserrat"
                   :fontSize "1.5rem"}}
     "CONTACT"]
@@ -72,7 +72,7 @@
     (fn []
       [:div {:style (st/page)}
        [:div {:style {:display (if (= @page "ABOUT") "block" "none")}}
-        [:div (map-indexed (fn [i c] ^{:key i} [particle-view c :page-particle]) "HELLO, MY NAME IS UDSCHAL.")]
+        [:div (map-indexed (fn [i c] ^{:key i} [particle-view c :page-about]) "HELLO, MY NAME IS UDSCHAL.")]
         [:div "I'm a front-end developer from Cologne, Germany."]
         [:div "Currently crafting keyput.com"]]
        [:div {:style {:display (if (= @page "TOOLS") "block" "none")}}

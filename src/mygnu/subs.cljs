@@ -9,19 +9,29 @@
    (reaction (:mouse @db))))
 
 (r/register-sub
-  :header-particle
+  :heading
   (fn [db [_ id]]
-    (reaction (-> @db :header-particles id))))
+    (reaction (-> @db :heading id))))
 
 (r/register-sub
-  :page-particle
+  :page-about
   (fn [db [_ id]]
-    (reaction (first (filter #(= (:id %) id) (:page-particles @db))))))
+    (reaction (first (filter #(= (:id %) id) (:page-about @db))))))
 
 (r/register-sub
-  :logo-s-particle
+  :page-tools
   (fn [db [_ id]]
-    (reaction (-> @db :logo-s-particles id))))
+    (reaction (first (filter #(= (:id %) id) (:page-tools @db))))))
+
+(r/register-sub
+  :page-work
+  (fn [db [_ id]]
+    (reaction (first (filter #(= (:id %) id) (:page-work @db))))))
+
+(r/register-sub
+  :logo-s
+  (fn [db [_ id]]
+    (reaction (-> @db :logo-s id))))
 
 (r/register-sub
   :page-active
