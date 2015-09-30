@@ -8,11 +8,16 @@
 (defn px [n]
   (str n "px"))
 
-(def transform-prop
+(def transform
   (js/Modernizr.prefixed "transform"))
 
+(def user-select
+  (js/Modernizr.prefixed "userSelect"))
+
 (defn prefix [styles]
-  (rename-keys styles {:transform transform-prop}))
+  (rename-keys styles
+               {:transform transform}
+               {:user-select user-select}))
 
 (defn camelize [styles]
   (into {} (for [[k v] styles] (vector (csk/->camelCase k) v))))

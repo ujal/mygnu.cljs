@@ -27,6 +27,7 @@
                                :opacity opacity
                                :display "inline-block"
                                :position "relative"
+                               :transform "translateZ(0)"
                                :min-width (if (= type :heading)
                                             "1.24688rem"
                                             "0.998438rem")}}
@@ -71,15 +72,15 @@
   (let [page (r/subscribe [:page-active])]
     (fn []
       [:div {:style (st/page)}
-       [:div {:style {:display (if (= @page "ABOUT") "block" "none")}}
+       [:div {:style {:display (if (= @page :page-about) "block" "none")}}
         [:div (map-indexed (fn [i c] ^{:key i} [particle-view c :page-about]) "HELLO, MY NAME IS UDSCHAL.")]
-        [:div "I'm a front-end developer from Cologne, Germany."]
-        [:div "Currently crafting keyput.com"]]
-       [:div {:style {:display (if (= @page "TOOLS") "block" "none")}}
+        [:div (map-indexed (fn [i c] ^{:key i} [particle-view c :page-about]) "I'm a front-end developer from Cologne, Germany.")]
+        [:div (map-indexed (fn [i c] ^{:key i} [particle-view c :page-about]) "Currently crafting keyput.com")]]
+       [:div {:style {:display (if (= @page :page-tools) "block" "none")}}
         [:div "TOOLS"]
         [:div "I'm a front-end developer from Cologne, Germany."]
         [:div "Currently crafting keyput.com"]]
-       [:div {:style {:display (if (= @page "WORK") "block" "none")}}
+       [:div {:style {:display (if (= @page :page-work) "block" "none")}}
         [:div "WORK"]
         [:div "I'm a front-end developer from Cologne, Germany."]
         [:div "Currently crafting keyput.com"]]])))

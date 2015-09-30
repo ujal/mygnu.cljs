@@ -70,13 +70,13 @@
     (go-loop []
              (when-let [m (<! ch)]
                (r/dispatch-sync [handlk id m])
-               (recur)))
-    state))
+               (recur))))
+  state)
 
 (r/register-handler
   :mouse-move
   (fn [state [_ e]]
-    (let [modulo (mod (.-clientX e) 7)]
+    (let [modulo (mod (.-clientX e) 30)]
       (cond
         (= modulo 0) (-> state
                          (transition-fn
@@ -108,23 +108,100 @@
     (-> state
         (assoc :is-hover false))))
 
-(defn page-fade-out [page]
-  (let [ks expr]
-    (transition-fn
-      (rand-nth (keys (:page-about state)))
-      {:opacity 0}
-      {:opacity 1}
-      1600
-      :update-page)))
+(r/register-handler
+  :transition-page-out
+  (fn [state [_ pagek m _]]
+    (-> state
+        (update pagek (fn [ps]
+                        (mapv (fn [p]
+                                (if (not= (:opacity p) 0)
+                                  (conj p m)
+                                  p))
+                              ps))))))
+
+(r/register-handler
+  :transition-page-in
+  (fn [state [_ pagek m rids]]
+    (-> state
+        (update pagek (fn [ps]
+                        (mapv (fn [p]
+                                (if ((into #{} rids) (:id p))
+                                  (conj p m)
+                                  p))
+                              ps))))))
+
+(defn transition-page-out [state pagek]
+  (let [ids (mapv #(:id %) (pagek state))
+        sids (shuffle ids)
+        rids (subvec sids (js/parseInt (* (count sids) 0.9)))
+        ch (transition {:opacity 1} {:opacity 0} {:duration 800})]
+    (go-loop []
+             (when-let [m (<! ch)]
+               (r/dispatch-sync [:transition-page-out pagek m rids])
+               (recur))))
+  state)
+
+
+(defn transition-page-in [state pagek]
+  (let [ids (mapv #(:id %) (pagek state))
+        sids (shuffle ids)
+        rids (subvec sids (js/parseInt (* (count sids) 0.9)))
+        ch (transition {:opacity 0} {:opacity 1} {:duration 800})]
+    (go-loop []
+             (when-let [m (<! ch)]
+               (r/dispatch-sync [:transition-page-in pagek m rids])
+               (if (= (:opacity m) 1)
+                 (r/dispatch-sync [:transition-page-in-end pagek]))
+               (recur))))
+  state)
+
+(defn hide-page-some [state pagek]
+    (let [ids (map #(:id %) (pagek state))
+          sids (shuffle ids)
+          rids (subvec sids (js/parseInt (* (count sids) 0.1)))]
+      (-> state
+          (update pagek (fn [ps]
+                          (mapv (fn [p]
+                                  (if ((into #{} rids) (:id p))
+                                    (conj p {:opacity 0})
+                                    p))
+                                ps))))))
+
+(r/register-handler
+  :transition-page-in-end
+  (fn [state [_ pagek]]
+    (let [ch (transition {:opacity 0} {:opacity 1} {:duration 800})]
+      (go-loop []
+                 (when-let [m (<! ch)]
+                   (r/dispatch-sync [:show-some pagek m])
+                   (recur))))
+    state))
+
+(r/register-handler
+  :show-some
+  (fn [state [_ pagek m]]
+    (-> state
+        (update pagek (fn [ps]
+                        (mapv (fn [p]
+                                (if (not= (:opacity p) 1)
+                                  (conj p m)
+                                  p))
+                              ps))))))
 
 (r/register-handler
   :nav-item-click
   (fn [state [_ e]]
-    (let [page (-> e .-target .-id)]
+    (let [last-pagek (:page-active state)
+          page (-> e .-target .-id)
+          pages {"ABOUT" :page-about
+                 "TOOLS" :page-tools
+                 "WORK"  :page-work}
+          new-pagek (pages page)]
       (-> state
-          ;(page-fade-out (:page-active state))
-          (assoc :page-active page)
-          ))))
+          (hide-page-some last-pagek)
+          (transition-page-out last-pagek)
+          #_(assoc :page-active new-pagek)
+          (transition-page-in new-pagek)))))
 
 (r/register-handler
   :time-update
