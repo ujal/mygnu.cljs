@@ -77,13 +77,11 @@
         [:div (map-indexed (fn [i c] ^{:key i} [particle-view c :page-about]) "I'm a front-end developer from Cologne, Germany.")]
         [:div (map-indexed (fn [i c] ^{:key i} [particle-view c :page-about]) "Currently crafting keyput.com")]]
        [:div {:style {:display (if (= @page :page-tools) "block" "none")}}
-        [:div "TOOLS"]
-        [:div "I'm a front-end developer from Cologne, Germany."]
-        [:div "Currently crafting keyput.com"]]
+        [:div (map-indexed (fn [i c] ^{:key i} [particle-view c :page-tools]) "TOOLS")]
+        [:div (map-indexed (fn [i c] ^{:key i} [particle-view c :page-tools]) "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod.")]]
        [:div {:style {:display (if (= @page :page-work) "block" "none")}}
-        [:div "WORK"]
-        [:div "I'm a front-end developer from Cologne, Germany."]
-        [:div "Currently crafting keyput.com"]]])))
+        [:div (map-indexed (fn [i c] ^{:key i} [particle-view c :page-tools]) "WORK")]
+        [:div (map-indexed (fn [i c] ^{:key i} [particle-view c :page-tools]) "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod.")]]])))
 
 (defn main-view []
   (fn []
