@@ -84,6 +84,7 @@
 
 (defn main-view []
   (fn []
+    (pr (reagent/adapt-react-class (.Spring js/ReactMotion)))
     [:div.board {:on-mouse-move #(r/dispatch-sync [:mouse-move %])}
      [:div.content {:style (st/content)}
       [header]
