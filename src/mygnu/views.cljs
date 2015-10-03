@@ -13,7 +13,9 @@
 (let [uid (atom 0)]
   (defn particle-view [c particle-type]
     (let [id (keyword (str @uid))
-          _ (swap! uid inc)]
+          _ (swap! uid inc)
+          spring (reagent/adapt-react-class (.-Spring js/ReactMotion))
+          presets (.-presets js/ReactMotion)]
       (reagent/create-class
         {:component-did-mount
          (fn [this]
@@ -22,18 +24,25 @@
          (let [p (r/subscribe [particle-type id])
                cs (map char (range 128 254))]
            (fn []
-             (let [opacity (or (:opacity @p) 1)]
-               [:span {:style {:color (:color @p)
-                               :opacity opacity
-                               :display "inline-block"
-                               :transform "translateZ(0)"
-                               :min-width (if (= particle-type :heading)
-                                            "1.24688rem"
-                                            "0.998438rem")}}
-                (if (< opacity 1)
-                  (rand-nth cs)
-                  (:char @p))])))}))))
-(defn header []
+             [spring {:defaultValue 0
+                      :endValue (if (:active @p) 1 0)}
+              (fn [t]
+                (pr t)
+                (reagent/as-element
+                  [:span {:style {:color (:color @p)
+                                  :opacity (if (:active @p)
+                                             t
+                                             (- 1 t))
+                                  :display "inline-block"
+                                  ;:transform "translateZ(0)"
+                                  :min-width (if (= particle-type :heading)
+                                               "1.24688rem"
+                                               "0.998438rem")}}
+                   (if (and (not= t 1)
+                            (not= t 0))
+                     (rand-nth cs)
+                     (:char @p))]))]))}))))
+(defn header [t]
   [:div {:style (st/headings)}
    [:span (map-indexed (fn [i c] ^{:key i} [particle-view c :heading]) "INTERACTIVE ")]
    [:span (map-indexed (fn [i c] ^{:key i} [particle-view c :heading]) "DESIGN ")]
@@ -84,13 +93,13 @@
 
 (defn main-view []
   (fn []
-    (pr (reagent/adapt-react-class (.Spring js/ReactMotion)))
-    [:div.board {:on-mouse-move #(r/dispatch-sync [:mouse-move %])}
-     [:div.content {:style (st/content)}
-      [header]
-      [:div {:style (st/logo)}
-       "⦠"]
-      [nav]
-      [page]
-      [footer]]]))
+    (let [spring (reagent/adapt-react-class (.-Spring js/ReactMotion))]
+      [:div.board {:on-mouse-move #(r/dispatch-sync [:mouse-move %])}
+       [:div.content {:style (st/content)}
+        [header]
+        [:div {:style (st/logo)}
+         "⦠"]
+        [nav]
+        #_[page]
+        [footer]]])))
 

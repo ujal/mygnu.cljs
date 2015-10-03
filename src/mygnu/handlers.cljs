@@ -19,7 +19,8 @@
    :width (.-offsetWidth el)
    :height (.-offsetHeight el)
    :origin-x (-> el .getBoundingClientRect .-left)
-   :origin-y (-> el .getBoundingClientRect .-top)})
+   :origin-y (-> el .getBoundingClientRect .-top)
+   :active false})
 
 (defn now []
   (.getTime (js/Date.)))
@@ -77,25 +78,16 @@
 (r/register-handler
   :mouse-move
   (fn [state [_ e]]
-    state
-    (let [modulo (mod (.-clientX e) 50)]
+    (let [modulo (mod (.-clientX e) 20)]
       (cond
         (= modulo 0) (-> state
-                         #_(transition-fn
-                           (rand-nth (keys (:heading state)))
-                           {:opacity 0}
-                           {:opacity 1}
-                           1600
-                           :update-heading)
-                         (transition-fn
-                           (rand-nth (keys (:logo-s state)))
-                           {:opacity 0}
-                           {:opacity 1}
-                           3600
-                           :update-logo-s)
-                         #_(update-color e)
-                         #_update-char)
-         (> modulo 0) (-> state)))))
+                         (update-in
+                           [:heading (rand-nth (keys (:heading state)))]
+                           (fn [p]
+                             (if (:active p)
+                               (conj p {:active (not (:active p))})
+                               (conj p {:active true})))))
+        (> modulo 0) (-> state)))))
 
 (r/register-handler
   :nav-mouse-move
