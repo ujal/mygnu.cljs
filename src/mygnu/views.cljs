@@ -11,24 +11,23 @@
   (.getTime (js/Date.)))
 
 (let [uid (atom 0)]
-  (defn particle-view [c type]
+  (defn particle-view [c particle-type]
     (let [id (keyword (str @uid))
           _ (swap! uid inc)]
       (reagent/create-class
         {:component-did-mount
          (fn [this]
-           (r/dispatch-sync [:particle-did-mount id c type this]))
+           (r/dispatch-sync [:particle-did-mount id c particle-type this]))
          :reagent-render
-         (let [p (r/subscribe [type id])
+         (let [p (r/subscribe [particle-type id])
                cs (map char (range 128 254))]
            (fn []
              (let [opacity (or (:opacity @p) 1)]
                [:span {:style {:color (:color @p)
                                :opacity opacity
                                :display "inline-block"
-                               :position "relative"
                                :transform "translateZ(0)"
-                               :min-width (if (= type :heading)
+                               :min-width (if (= particle-type :heading)
                                             "1.24688rem"
                                             "0.998438rem")}}
                 (if (< opacity 1)
@@ -71,17 +70,17 @@
 (defn page []
   (let [page (r/subscribe [:page-active])]
     (fn []
-      [:div {:style (st/page)}
-       [:div {:style {:display (if (= @page :page-about) "block" "none")}}
-        [:div (map-indexed (fn [i c] ^{:key i} [particle-view c :page-about]) "HELLO, MY NAME IS UDSCHAL.")]
-        [:div (map-indexed (fn [i c] ^{:key i} [particle-view c :page-about]) "I'm a front-end developer from Cologne, Germany.")]
-        [:div (map-indexed (fn [i c] ^{:key i} [particle-view c :page-about]) "Currently crafting keyput.com")]]
-       [:div {:style {:display (if (= @page :page-tools) "block" "none")}}
-        [:div (map-indexed (fn [i c] ^{:key i} [particle-view c :page-tools]) "TOOLS")]
-        [:div (map-indexed (fn [i c] ^{:key i} [particle-view c :page-tools]) "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod.")]]
-       [:div {:style {:display (if (= @page :page-work) "block" "none")}}
-        [:div (map-indexed (fn [i c] ^{:key i} [particle-view c :page-tools]) "WORK")]
-        [:div (map-indexed (fn [i c] ^{:key i} [particle-view c :page-tools]) "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod.")]]])))
+      [:div {:style st/page}
+         [:div {:style {:display (if (= @page :page-about) "block" "none")}}
+          [:div (map-indexed (fn [i c] ^{:key i} [particle-view c :page-about]) "HELLO, MY NAME IS UDSCHAL.")]
+          [:div (map-indexed (fn [i c] ^{:key i} [particle-view c :page-about]) "I'm a front-end developer from Cologne, Germany.")]
+          [:div (map-indexed (fn [i c] ^{:key i} [particle-view c :page-about]) "Currently crafting keyput.com")]]
+         [:div {:style {:display (if (= @page :page-tools) "block" "none")}}
+          [:div (map-indexed (fn [i c] ^{:key i} [particle-view c :page-tools]) "TOOLS")]
+          [:div (map-indexed (fn [i c] ^{:key i} [particle-view c :page-tools]) "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod.")]]
+         [:div {:style {:display (if (= @page :page-work) "block" "none")}}
+          [:div (map-indexed (fn [i c] ^{:key i} [particle-view c :page-work]) "WORK")]
+          [:div (map-indexed (fn [i c] ^{:key i} [particle-view c :page-work]) "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod.")]]])))
 
 (defn main-view []
   (fn []

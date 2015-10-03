@@ -16,8 +16,7 @@
 
 (defn prefix [styles]
   (rename-keys styles
-               {:transform transform}
-               {:user-select user-select}))
+               {:transform transform}))
 
 (defn camelize [styles]
   (into {} (for [[k v] styles] (vector (csk/->camelCase k) v))))
@@ -89,7 +88,7 @@
      :line-height "3.2rem"
      :user-select "none"}))
 
-(defn page []
+(def page
   (pipe
     {:fontSize (rm (* fs 1.5))
      :margin (rm (* lhs 2))
