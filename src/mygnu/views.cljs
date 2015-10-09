@@ -51,7 +51,7 @@
                                       ;(str "hsla(" (rand-int 360) ",50%,50%,.7)"))
                              :opacity (if (:active @p)
                                         o
-                                        o)
+                                        0)
                              :transform "translateZ(0)"
                              :display "inline-block"
                              :min-width "0.998438rem"}}
@@ -69,7 +69,8 @@
        (fn [t]
          (let [o (.-val t)]
            (reagent/as-element
-             [:span {:style {:color nil
+             [:span {:on-click #(r/dispatch-sync [:nav-p-click id])
+                     :style {:color (if (:active @p) "hsla(0,0%,30%,1)")
                              :opacity nil
                              :transform "translateZ(0)"
                              :display "inline-block"
@@ -110,8 +111,8 @@
   (let [items ["ABOUT" "TOOLS" "WORK"]
         page-active (r/subscribe [:page-active])]
     [:ul {:style st/nav
-          :on-mouse-enter #(r/dispatch-sync [:nav-mouse-enter])
-          :on-mouse-leave #(r/dispatch-sync [:nav-mouse-leave])}
+              :on-mouse-enter #(r/dispatch-sync [:nav-mouse-enter])
+              :on-mouse-leave #(r/dispatch-sync [:nav-mouse-leave])}
      (map (partial nav-item @page-active) items)]))
 
 (defn footer []
@@ -130,24 +131,29 @@
 (defn pages []
   (reagent/create-class
     {:component-did-mount
-     (fn [this] (r/dispatch [:show-page-p :page-about]))
+     (fn [this]
+       (r/dispatch [:show-page-p :page-about])
+       (r/dispatch [:nav-p-click :34]))
      :reagent-render
      (let [page (r/subscribe [:page-active])
            motion (reagent/adapt-react-class (.-Motion js/ReactMotion))
            spring (.-spring js/ReactMotion)]
        (fn []
          [:div {:style st/page}
-          [:div {:style {:display (if (= @page :page-about) "block" "none")}}
+          [:div.page {:style {:display (if (= @page :page-about) "block" "none")}}
            [:div (map-indexed (fn [i c] ^{:key i} [particle-view c :page-about]) "HELLO, MY NAME IS UDSCHAL.")]
            [:div (map-indexed (fn [i c] ^{:key i} [particle-view c :page-about]) "I'm a front-end developer from Cologne, Germany.")]
-           [:div (map-indexed (fn [i c] ^{:key i} [particle-view c :page-about]) "Currently crafting keyput.com")]]
-          [:div {:style {:display (if (= @page :page-tools) "block" "none")}}
+           [:div
+            [:span (map-indexed (fn [i c] ^{:key i} [particle-view c :page-about]) "Currently crafting ")]
+            [:a {:href "http://keyput.com" :target "_blank"}
+             (map-indexed (fn [i c] ^{:key i} [particle-view c :page-about]) "keyput.com")]]]
+          [:div.page {:style {:display (if (= @page :page-tools) "block" "none")}}
            [:div (map-indexed (fn [i c] ^{:key i} [particle-view c :page-tools]) "HTML5/CSS3/LESS/SASS")]
            [:div (map-indexed (fn [i c] ^{:key i} [particle-view c :page-tools]) "JavaScript/CoffeScript/ClojureScript")]
            [:div (map-indexed (fn [i c] ^{:key i} [particle-view c :page-tools]) "Backbone/React/Node/Reagent")]
            [:div (map-indexed (fn [i c] ^{:key i} [particle-view c :page-tools]) "Ruby/PHP")]
            [:div (map-indexed (fn [i c] ^{:key i} [particle-view c :page-tools]) "Sinatra/Rails Slim/CakePHP")]]
-          [:div {:style {:display (if (= @page :page-work) "block" "none")}}
+          [:div.page {:style {:display (if (= @page :page-work) "block" "none")}}
            [:div (map-indexed (fn [i c] ^{:key i} [particle-view c :page-work]) "WORK")]
            [:div (map-indexed (fn [i c] ^{:key i} [particle-view c :page-work]) "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod.")]]]))}))
 

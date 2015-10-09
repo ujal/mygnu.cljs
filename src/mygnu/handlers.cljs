@@ -30,7 +30,7 @@
   (fn  [_ _]
     db/default-db))
 
-(defn add-particle [state p-type {:keys [id] :as p}]
+(defn add-particle [state p-type {:keys [id char] :as p}]
   (if (re-matches #":page(.*)" (str p-type))
     (update state p-type #(conj % p))
     (assoc-in state [p-type id] p)))
@@ -98,7 +98,7 @@
                                    ps))))
 
 (defn hide-page-rand [{:keys [page-active] :as state}]
-  (let [ids (remove nil? (map (fn [p]
+  (let [ids (filter identity (map (fn [p]
                                  (if (not= (:opacity p) 1)
                                    (:id p)))
                                (page-active state)))
@@ -118,7 +118,7 @@
   (fn [state [_]]
     (-> state
         (assoc :is-hover true)
-        hide-page-rand)))
+        #_hide-page-rand)))
 
 
 (r/register-handler
@@ -126,10 +126,10 @@
   (fn [state [_]]
     (-> state
         (assoc :is-hover false)
-        show-page-rand)))
+        #_show-page-rand)))
 
 (defn transition-page-in [state pagek]
-  (let [ids (remove nil? (map (fn [p]
+  (let [ids (filter identity (map (fn [p]
                                  (if (not= (:opacity p) 1)
                                    (:id p)))
                                (pagek state)))
@@ -182,12 +182,22 @@
     (show-page-p state pagek)))
 
 (r/register-handler
+  :nav-p-click
+  (fn [state [_ id]]
+    (-> state
+        (assoc :nav (into {} (map (fn [[k v]]
+                                    (hash-map k (conj v {:active false})))
+                                  (:nav state))))
+        (update-in [:nav id] (fn [p]
+                               (conj p {:active true}))))))
+
+(r/register-handler
   :nav-item-click
   (fn [state [_ page]]
-    (let [last-pagek (:page-active state)
-          pages {"ABOUT" :page-about
+    (let [pages {"ABOUT" :page-about
                  "TOOLS" :page-tools
                  "WORK"  :page-work}
+          last-pagek (:page-active state)
           new-pagek (pages page)]
       (-> state
           (hide-page last-pagek)
