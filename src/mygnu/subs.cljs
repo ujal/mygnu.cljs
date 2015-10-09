@@ -4,11 +4,6 @@
   (:require [re-frame.core :as r]))
 
 (r/register-sub
- :mouse
- (fn [db]
-   (reaction (:mouse @db))))
-
-(r/register-sub
   :heading
   (fn [db [_ id]]
     (reaction (-> @db :heading id))))
@@ -29,6 +24,11 @@
     (reaction (first (filter #(= (:id %) id) (:page-work @db))))))
 
 (r/register-sub
+  :logo
+  (fn [db [_ id]]
+    (reaction (-> @db :logo id))))
+
+(r/register-sub
   :logo-s
   (fn [db [_ id]]
     (reaction (-> @db :logo-s id))))
@@ -37,3 +37,8 @@
   :page-active
   (fn [db [_]]
     (reaction (-> @db :page-active))))
+
+(r/register-sub
+  :nav
+  (fn [db [_ id]]
+    (reaction (-> @db :nav id))))

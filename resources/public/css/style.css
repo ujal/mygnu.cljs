@@ -10,3 +10,12 @@ body, html, #app, .board {
   background: hsla(9, 100%, 99.5%, 1);
   overflow: auto;
 }
+
+a, a:hover {
+  color: hsla(0, 0%, 65%, 1);
+  transition: all .25s;
+}
+
+.active a::first-letter {
+  color: hsla(0, 0%, 30%, 1);
+}

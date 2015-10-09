@@ -37,4 +37,4 @@
 
 
 (defn on-js-reload []
-  (mount-root))
+  #_(mount-root))

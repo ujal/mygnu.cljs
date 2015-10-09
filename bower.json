@@ -14,6 +14,7 @@
   ],
   "dependencies": {
     "skeleton": "~2.0.4",
-    "html5-boilerplate": "~5.2.0"
+    "html5-boilerplate": "~5.2.0",
+    "react-motion": "~0.3.0"
   }
 }

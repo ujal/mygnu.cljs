@@ -8,29 +8,28 @@
 (defn px [n]
   (str n "px"))
 
-(def transform
-  (js/Modernizr.prefixed "transform"))
+;(def transform
+  ;(js/Modernizr.prefixed "transform"))
 
-(def user-select
-  (js/Modernizr.prefixed "userSelect"))
+;(def user-select
+  ;(js/Modernizr.prefixed "userSelect"))
 
-(defn prefix [styles]
-  (rename-keys styles
-               {:transform transform}))
+;(defn prefix [styles]
+  ;(rename-keys styles
+               ;{:transform transform}))
 
 (defn camelize [styles]
   (into {} (for [[k v] styles] (vector (csk/->camelCase k) v))))
 
 (defn pipe [m]
   (-> m
-      prefix
       camelize))
 
 (def fs 1.5)
 (def lh 1.6)
 (def lhs (* fs 1.6))
 
-(defn content []
+(def content
   (pipe
     {:position "relative"
      :font-size (rm (* fs 2))
@@ -42,7 +41,7 @@
      :height "100%"
      :color "hsla(0, 0%, 30%, 1)"}))
 
-(defn headings []
+(def headings
   (pipe {:font-size (rm (* fs 2))
          :font-family "VT323"
          :line-height 1
@@ -52,18 +51,17 @@
          :margin-left (rm lhs)
          :margin-right (rm lhs)}))
 
-(defn logo []
+(def logo
   (pipe
     {:fontSize "7rem"
      :fontFamily "Montserrat"
      :fontWeight "400"
      :transform "rotate(90deg)"
      :display "inline-block"
-     ;:margin (rm (* lhs 1))
      :margin 0
      }))
 
-(defn nav []
+(def nav
   (pipe
     {:list-style "decimal outside none"
      :color "#1EAEDB"
@@ -72,7 +70,7 @@
      :fontSize "2rem"
      :fontWeight "700"}))
 
-(defn nav-item []
+(def nav-item
   (pipe
     {:display "inline-block"
      :margin-right (str (* 1.5 1.6) "rem")
@@ -82,7 +80,7 @@
      :line-height lh
      :user-select "none"}))
 
-(defn nav-item-a []
+(def nav-item-a
   (pipe
     {:display "inline-block"
      :line-height "3.2rem"
@@ -94,7 +92,7 @@
      :margin (rm (* lhs 2))
      :line-height lh}))
 
-(defn footer []
+(def footer
   (pipe
     {:fontSize "2rem"
      :line-height lh
