@@ -25,3 +25,11 @@ a span:hover {
   /*transition: all .25s;*/
 }
 
+.page {
+  position: absolute;
+  left: 0; right: 0;
+}
+
+* {
+  -webkit-transform: translateZ(0);
+}

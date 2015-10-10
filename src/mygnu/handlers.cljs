@@ -148,12 +148,12 @@
 
 (defn hide-page [state pagek]
   (update state pagek (fn [ps]
-                  (map (fn [p]
-                         (conj p {:active false}))
-                       ps))))
+                        (map (fn [p]
+                               (conj p {:active false}))
+                             ps))))
 
 (defn show-page-p [state pagek]
-  (let [ids (remove nil? (map (fn [p]
+  (let [ids (filter identity (map (fn [p]
                                 (if (not (:active p))
                                   (:id p)))
                               (pagek state)))
@@ -163,8 +163,14 @@
       (r/dispatch-sync [:transition-page-p pagek {:active true} rids])
       (<! (timeout 100))
       (if (> (count ids) 0)
-        (r/dispatch [:show-page-p pagek]))))
-  state)
+        (r/dispatch [:show-page-p pagek])
+        (r/dispatch [:transition-page-end pagek]))))
+  (assoc state :in-transition true))
+
+(r/register-handler
+  :transition-page-end
+  (fn [state [_ pagek m rids]]
+    (assoc state :in-transition false)))
 
 (r/register-handler
   :transition-page-p
@@ -175,6 +181,13 @@
                              (conj p m)
                              p))
                          ps)))))
+
+(r/register-handler
+  :cancel-transition
+  (fn [state [_ pagek]]
+    (-> state
+    (hide-page pagek)
+    (assoc :transition-cancel false))))
 
 (r/register-handler
   :show-page-p
@@ -199,11 +212,12 @@
                  "WORK"  :page-work}
           last-pagek (:page-active state)
           new-pagek (pages page)]
-      (-> state
-          (hide-page last-pagek)
-          (hide-page new-pagek)
-          (show-page-p new-pagek)
-          (assoc :page-active new-pagek)))))
+      (if (:in-transition state)
+        (-> state)
+        (-> state
+            (hide-page last-pagek)
+            (show-page-p new-pagek)
+            (assoc :page-active new-pagek))))))
 
 (r/register-handler
   :time-update

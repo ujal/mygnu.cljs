@@ -44,8 +44,7 @@
                                    :main mygnu.core
                                    :optimizations :advanced
                                    :pretty-print false
-                                   :externs ["resources/public/bower_components/react-motion/build/react-motion.js"]
-                                   }}]}
+                                   :externs ["resources/public/bower_components/react-motion/build/react-motion.js"]}}]}
 
   :figwheel {
              ;; :http-server-root "public" ;; default and assumes "resources"

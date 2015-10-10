@@ -51,7 +51,7 @@
                                       ;(str "hsla(" (rand-int 360) ",50%,50%,.7)"))
                              :opacity (if (:active @p)
                                         o
-                                        0)
+                                        o)
                              :transform "translateZ(0)"
                              :display "inline-block"
                              :min-width "0.998438rem"}}
@@ -93,7 +93,7 @@
 
 (defn header [t]
   [:div {:style st/headings}
-   [:span (map-indexed (fn [i c] ^{:key i} [particle-view c :heading]) "INTERACTION ")]
+   [:span (map-indexed (fn [i c] ^{:key i} [particle-view c :heading]) "INTERACTIVE ")]
    [:span (map-indexed (fn [i c] ^{:key i} [particle-view c :heading]) "DESIGN ")]
    [:span (map-indexed (fn [i c] ^{:key i} [particle-view c :heading]) "& DEVELOPMENT")]])
 
@@ -140,20 +140,20 @@
            spring (.-spring js/ReactMotion)]
        (fn []
          [:div {:style st/page}
-          [:div.page {:style {:display (if (= @page :page-about) "block" "none")}}
+          [:div.page {:style {:z-index (if (= @page :page-about) 100 0)}}
            [:div (map-indexed (fn [i c] ^{:key i} [particle-view c :page-about]) "HELLO, MY NAME IS UDSCHAL.")]
            [:div (map-indexed (fn [i c] ^{:key i} [particle-view c :page-about]) "I'm a front-end developer from Cologne, Germany.")]
            [:div
             [:span (map-indexed (fn [i c] ^{:key i} [particle-view c :page-about]) "Currently crafting ")]
             [:a {:href "http://keyput.com" :target "_blank"}
              (map-indexed (fn [i c] ^{:key i} [particle-view c :page-about]) "keyput.com")]]]
-          [:div.page {:style {:display (if (= @page :page-tools) "block" "none")}}
+          [:div.page {:style {:z-index (if (= @page :page-tools) 100 0)}}
            [:div (map-indexed (fn [i c] ^{:key i} [particle-view c :page-tools]) "HTML5/CSS3/LESS/SASS")]
            [:div (map-indexed (fn [i c] ^{:key i} [particle-view c :page-tools]) "JavaScript/CoffeScript/ClojureScript")]
            [:div (map-indexed (fn [i c] ^{:key i} [particle-view c :page-tools]) "Backbone/React/Node/Reagent")]
            [:div (map-indexed (fn [i c] ^{:key i} [particle-view c :page-tools]) "Ruby/PHP")]
            [:div (map-indexed (fn [i c] ^{:key i} [particle-view c :page-tools]) "Sinatra/Rails Slim/CakePHP")]]
-          [:div.page {:style {:display (if (= @page :page-work) "block" "none")}}
+          [:div.page {:style {:z-index (if (= @page :page-work) 100 0)}}
            [:div (map-indexed (fn [i c] ^{:key i} [particle-view c :page-work]) "WORK")]
            [:div (map-indexed (fn [i c] ^{:key i} [particle-view c :page-work]) "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod.")]]]))}))
 
