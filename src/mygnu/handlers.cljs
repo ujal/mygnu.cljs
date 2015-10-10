@@ -183,13 +183,6 @@
                          ps)))))
 
 (r/register-handler
-  :cancel-transition
-  (fn [state [_ pagek]]
-    (-> state
-    (hide-page pagek)
-    (assoc :transition-cancel false))))
-
-(r/register-handler
   :show-page-p
   (fn [state [_ pagek]]
     (show-page-p state pagek)))
@@ -197,12 +190,14 @@
 (r/register-handler
   :nav-p-click
   (fn [state [_ id]]
-    (-> state
-        (assoc :nav (into {} (map (fn [[k v]]
-                                    (hash-map k (conj v {:active false})))
-                                  (:nav state))))
-        (update-in [:nav id] (fn [p]
-                               (conj p {:active true}))))))
+    (if (:in-transition state)
+      state
+      (-> state
+          (assoc :nav (into {} (map (fn [[k v]]
+                                      (hash-map k (conj v {:active false})))
+                                    (:nav state))))
+          (update-in [:nav id] (fn [p]
+                                 (conj p {:active true})))))))
 
 (r/register-handler
   :nav-item-click
