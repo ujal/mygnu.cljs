@@ -147,17 +147,20 @@
       (<! (timeout 100))
       (if (> (count ids) 0)
         (r/dispatch-sync [:show-page-p pagek])
-        (r/dispatch-sync [:transition-page-end pagek]))))
+        (r/dispatch-sync [:show-page-end pagek]))))
   (assoc state :in-transition true))
 
 (r/register-handler
-  :transition-page-end
+  :show-page-end
   (fn [state [_ pagek m rids]]
     (assoc state :in-transition false)))
 
 (r/register-handler
   :transition-page-p
   (fn [state [_ pagek m rids]]
+    ;(assoc :nav (into {} (map (fn [[k v]]
+                                ;(hash-map k (conj v {:active false})))
+                              ;(:nav state))))
     (update state pagek (fn [ps]
                     (map (fn [p]
                            (if ((into #{} rids) (:id p))
@@ -169,18 +172,6 @@
   :show-page-p
   (fn [state [_ pagek]]
     (show-page-p state pagek)))
-
-(r/register-handler
-  :nav-p-click
-  (fn [state [_ id]]
-    (if (:in-transition state)
-      state
-      (-> state
-          (assoc :nav (into {} (map (fn [[k v]]
-                                      (hash-map k (conj v {:active false})))
-                                    (:nav state))))
-          (update-in [:nav id] (fn [p]
-                                 (conj p {:active true})))))))
 
 (r/register-handler
   :nav-item-click
@@ -196,6 +187,18 @@
             (hide-page last-pagek)
             (show-page-p new-pagek)
             (assoc :page-active new-pagek))))))
+
+(r/register-handler
+  :nav-p-click
+  (fn [state [_ id]]
+    (if (:in-transition state)
+      state
+      (-> state
+          (assoc :nav (into {} (map (fn [[k v]]
+                                      (hash-map k (conj v {:active false})))
+                                    (:nav state))))
+          (update-in [:nav id] (fn [p]
+                                 (conj p {:active true})))))))
 
 (r/register-handler
   :time-update

@@ -62,7 +62,7 @@
          (let [o (.-val t)]
            (reagent/as-element
              [:span {:style {:opacity o
-                             :transform (str "scale(" o ")")
+                             ;:transform (str "scale(" o ")")
                              :display "inline-block"
                              :min-width "0.998438rem"}}
               (if (not= o 1)
