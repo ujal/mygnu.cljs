@@ -128,23 +128,6 @@
         (assoc :is-hover false)
         #_show-page-rand)))
 
-(defn transition-page-in [state pagek]
-  (let [ids (filter identity (map (fn [p]
-                                 (if (not= (:opacity p) 1)
-                                   (:id p)))
-                               (pagek state)))
-        sids (shuffle ids)
-        rids (subvec sids (js/parseInt (* (count sids) 0.7)))
-        ch (transition {:opacity 0} {:opacity 1} {:duration 100 :easing :linear})]
-    (go-loop []
-             (when-let [m (<! ch)]
-               (r/dispatch-sync [:transition-page-in pagek m rids])
-               (if (and (= (:opacity m) 1)
-                        (> (count ids) 0))
-                 (r/dispatch [:transition-page-in-end pagek]))
-               (recur))))
-  state)
-
 
 (defn hide-page [state pagek]
   (update state pagek (fn [ps]
@@ -163,8 +146,8 @@
       (r/dispatch-sync [:transition-page-p pagek {:active true} rids])
       (<! (timeout 100))
       (if (> (count ids) 0)
-        (r/dispatch [:show-page-p pagek])
-        (r/dispatch [:transition-page-end pagek]))))
+        (r/dispatch-sync [:show-page-p pagek])
+        (r/dispatch-sync [:transition-page-end pagek]))))
   (assoc state :in-transition true))
 
 (r/register-handler

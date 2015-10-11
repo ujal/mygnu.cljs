@@ -35,30 +35,6 @@
                 (rand-nth cs)
                 (:char @p))])))])))
 
-(defn page-render [p-type id]
-  (let [motion (reagent/adapt-react-class (.-Motion js/ReactMotion))
-        spring (.-spring js/ReactMotion)
-        p (r/subscribe [p-type id])]
-    (fn []
-      [motion {:defaultStyle {:val 0}
-               :style {:val (spring (if (:active @p) 1 0) #js [210 20])}}
-       (fn [t]
-         (let [o (.-val t)]
-           (reagent/as-element
-             [:span {:style {:color nil
-                             ;(if (and (not= o 1)
-                                             ;(not= o 0))
-                                      ;(str "hsla(" (rand-int 360) ",50%,50%,.7)"))
-                             :opacity (if (:active @p)
-                                        o
-                                        o)
-                             :transform "translateZ(0)"
-                             :display "inline-block"
-                             :min-width "0.998438rem"}}
-              (if (not= o 1)
-                (rand-nth cs)
-                (:char @p))])))])))
-
 (defn nav-render [p-type id]
   (let [motion (reagent/adapt-react-class (.-Motion js/ReactMotion))
         spring (.-spring js/ReactMotion)
@@ -72,10 +48,26 @@
              [:span {:on-click #(r/dispatch-sync [:nav-p-click id])
                      :style {:color (if (:active @p) "hsla(0,0%,30%,1)")
                              :opacity nil
-                             :transform "translateZ(0)"
+                             :display "inline-block"}}
+              (:char @p)])))])))
+
+(defn page-render [p-type id]
+  (let [motion (reagent/adapt-react-class (.-Motion js/ReactMotion))
+        spring (.-spring js/ReactMotion)
+        p (r/subscribe [p-type id])]
+    (fn []
+      [motion {:defaultStyle {:val 0}
+               :style {:val (spring (if (:active @p) 1 0) #js [210 20])}}
+       (fn [t]
+         (let [o (.-val t)]
+           (reagent/as-element
+             [:span {:style {:opacity o
+                             :transform (str "scale(" o ")")
                              :display "inline-block"
                              :min-width "0.998438rem"}}
-              (:char @p)])))])))
+              (if (not= o 1)
+                (rand-nth cs)
+                (:char @p))])))])))
 
 (let [uid (atom 0)]
   (defn particle-view [c p-type]
@@ -86,8 +78,8 @@
          (fn [this] (r/dispatch-sync [:particle-did-mount id c p-type this]))
          :reagent-render (case p-type
                            :heading (heading-render p-type id)
-                           :logo-s  (heading-render p-type id)
-                           :logo  (heading-render p-type id)
+                           :logo-s (heading-render p-type id)
+                           :logo (heading-render p-type id)
                            :nav (nav-render p-type id)
                            (page-render p-type id))}))))
 

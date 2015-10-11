@@ -11,17 +11,20 @@
 (r/register-sub
   :page-about
   (fn [db [_ id]]
-    (reaction (first (filter #(= (:id %) id) (:page-about @db))))))
+    (let [page-ps (reaction (:page-about @db))]
+      (reaction (first (filter #(= (:id %) id) @page-ps))))))
 
 (r/register-sub
   :page-tools
   (fn [db [_ id]]
-    (reaction (first (filter #(= (:id %) id) (:page-tools @db))))))
+    (let [page-ps (reaction (:page-tools @db))]
+      (reaction (first (filter #(= (:id %) id) @page-ps))))))
 
 (r/register-sub
   :page-work
   (fn [db [_ id]]
-    (reaction (first (filter #(= (:id %) id) (:page-work @db))))))
+    (let [page-ps (reaction (:page-work @db))]
+      (reaction (first (filter #(= (:id %) id) @page-ps))))))
 
 (r/register-sub
   :logo
