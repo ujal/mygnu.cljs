@@ -31,9 +31,10 @@
     db/default-db))
 
 (defn add-particle [state p-type {:keys [id char] :as p}]
-  (if (re-matches #":page(.*)" (str p-type))
-    (update state p-type #(conj % p))
-    (assoc-in state [p-type id] p)))
+  (assoc-in state [p-type id] p)
+  #_(if (re-matches #":page(.*)" (str p-type))
+      (update state p-type #(conj % p))
+      (assoc-in state [p-type id] p)))
 
 (r/register-handler
   :particle-did-mount
@@ -130,16 +131,15 @@
 
 
 (defn hide-page [state pagek]
-  (update state pagek (fn [ps]
-                        (map (fn [p]
-                               (conj p {:active false}))
-                             ps))))
+  (assoc state pagek (into {} (map (fn [[k v]]
+                                (hash-map k (conj v {:active false})))
+                              (pagek state)))))
 
-(defn show-page-p [state pagek]
-  (let [ids (filter identity (map (fn [p]
-                                (if (not (:active p))
-                                  (:id p)))
-                              (pagek state)))
+(defn show-page-p [state pagek ]
+  (let [ids (filter identity (map (fn [[k v]]
+                                    (if (not (:active v))
+                                      (:id v)))
+                                     (pagek state)))
         sids (shuffle ids)
         rids (subvec sids (js/parseInt (* (count sids) 0.66)))]
     (go
@@ -147,26 +147,22 @@
       (<! (timeout 100))
       (if (> (count ids) 0)
         (r/dispatch-sync [:show-page-p pagek])
-        (r/dispatch-sync [:show-page-end pagek]))))
+        (r/dispatch-sync [:show-page-end]))))
   (assoc state :in-transition true))
 
 (r/register-handler
   :show-page-end
-  (fn [state [_ pagek m rids]]
+  (fn [state [_]]
     (assoc state :in-transition false)))
 
 (r/register-handler
   :transition-page-p
   (fn [state [_ pagek m rids]]
-    ;(assoc :nav (into {} (map (fn [[k v]]
-                                ;(hash-map k (conj v {:active false})))
-                              ;(:nav state))))
-    (update state pagek (fn [ps]
-                    (map (fn [p]
-                           (if ((into #{} rids) (:id p))
-                             (conj p m)
-                             p))
-                         ps)))))
+    (assoc state pagek (into {} (map (fn [[k v]]
+                                       (if ((into #{} rids) (:id v))
+                                         (hash-map k (conj v {:active true}))
+                                         (hash-map k v)))
+                              (pagek state))))))
 
 (r/register-handler
   :show-page-p
@@ -181,8 +177,9 @@
                  "WORK"  :page-work}
           last-pagek (:page-active state)
           new-pagek (pages page)]
+
       (if (:in-transition state)
-        (-> state)
+        state
         (-> state
             (hide-page last-pagek)
             (show-page-p new-pagek)

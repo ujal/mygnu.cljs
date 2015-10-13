@@ -11,20 +11,35 @@
 (r/register-sub
   :page-about
   (fn [db [_ id]]
-    (let [page-ps (reaction (:page-about @db))]
-      (reaction (first (filter #(= (:id %) id) @page-ps))))))
+    (reaction (-> @db :page-about id))))
 
 (r/register-sub
   :page-tools
   (fn [db [_ id]]
-    (let [page-ps (reaction (:page-tools @db))]
-      (reaction (first (filter #(= (:id %) id) @page-ps))))))
+    (reaction (-> @db :page-tools id))))
 
 (r/register-sub
   :page-work
   (fn [db [_ id]]
-    (let [page-ps (reaction (:page-work @db))]
-      (reaction (first (filter #(= (:id %) id) @page-ps))))))
+    (reaction (-> @db :page-work id))))
+
+;(r/register-sub
+  ;:page-about
+  ;(fn [db [_ id]]
+    ;(let [page-ps (reaction (:page-about @db))]
+      ;(reaction (first (filter #(= (:id %) id) @page-ps))))))
+
+;(r/register-sub
+  ;:page-tools
+  ;(fn [db [_ id]]
+    ;(let [page-ps (reaction (:page-tools @db))]
+      ;(reaction (first (filter #(= (:id %) id) @page-ps))))))
+
+;(r/register-sub
+  ;:page-work
+  ;(fn [db [_ id]]
+    ;(let [page-ps (reaction (:page-work @db))]
+      ;(reaction (first (filter #(= (:id %) id) @page-ps))))))
 
 (r/register-sub
   :logo

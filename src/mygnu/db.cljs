@@ -6,6 +6,6 @@
    :logo {}
    :nav {}
    :logo-s {}
-   :page-about []
-   :page-tools []
-   :page-work []})
+   :page-about {}
+   :page-tools {}
+   :page-work {}})

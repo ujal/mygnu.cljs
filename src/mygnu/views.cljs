@@ -28,8 +28,34 @@
                              :opacity (if (:active @p)
                                         o
                                         (- 1 o))
+                             :transform "translateZ(0)"
                              :display "inline-block"
-                             :min-width "1.24688rem"}}
+                             ;:min-width "1.24688rem"
+                             :min-width "1.35rem"
+                             }}
+              (if (and (not= o 1)
+                       (not= o 0))
+                (rand-nth cs)
+                (:char @p))])))])))
+
+(defn logo-render [p-type id]
+  (let [motion (reagent/adapt-react-class (.-Motion js/ReactMotion))
+        spring (.-spring js/ReactMotion)
+        p (r/subscribe [p-type id])]
+    (fn []
+      [motion {:defaultStyle {:val 0}
+               :style {:val (spring (if (:active @p) 1 0) #js [180 20])}}
+       (fn [t]
+         (let [o (.-val t)]
+           (reagent/as-element
+             [:span {:style {:color (if (and (not= o 1)
+                                             (not= o 0))
+                                      (str "hsla(" (rand-int 180) ",50%,50%,.7)"))
+                             :opacity (if (:active @p)
+                                        o
+                                        (- 1 o))
+                             :transform "translateZ(0)"
+                             :display "inline-block"}}
               (if (and (not= o 1)
                        (not= o 0))
                 (rand-nth cs)
@@ -57,14 +83,18 @@
         p (r/subscribe [p-type id])]
     (fn []
       [motion {:defaultStyle {:val 0}
+               ;:style {:val (spring (if (:active @p) 1 0))}}
                :style {:val (spring (if (:active @p) 1 0) #js [210 20])}}
        (fn [t]
          (let [o (.-val t)]
            (reagent/as-element
              [:span {:style {:opacity o
                              ;:transform (str "scale(" o ")")
+                             :transform "translateZ(0)"
                              :display "inline-block"
-                             :min-width "0.998438rem"}}
+                             ;:min-width "0.998438rem"
+                             :min-width "1.05rem"
+                             }}
               (if (not= o 1)
                 (rand-nth cs)
                 (:char @p))])))])))
@@ -79,15 +109,16 @@
          :reagent-render (case p-type
                            :heading (heading-render p-type id)
                            :logo-s (heading-render p-type id)
-                           :logo (heading-render p-type id)
+                           :logo (logo-render p-type id)
                            :nav (nav-render p-type id)
                            (page-render p-type id))}))))
 
 (defn header [t]
   [:div {:style st/headings}
-   [:span (map-indexed (fn [i c] ^{:key i} [particle-view c :heading]) "INTERACTIVE ")]
-   [:span (map-indexed (fn [i c] ^{:key i} [particle-view c :heading]) "DESIGN ")]
-   [:span (map-indexed (fn [i c] ^{:key i} [particle-view c :heading]) "& DEVELOPMENT")]])
+   [:span (map-indexed (fn [i c] ^{:key i} [particle-view c :heading]) "INTERACTIVE DESIGN & DEVELOPMENT")]
+   ;[:span (map-indexed (fn [i c] ^{:key i} [particle-view c :heading]) "DESIGN ")]
+   ;[:span (map-indexed (fn [i c] ^{:key i} [particle-view c :heading]) "& DEVELOPMENT")]
+   ])
 
   (defn nav-item [page-active item]
     (let [re (re-pattern (str "(?i)(.*)" item))
@@ -124,7 +155,7 @@
   (reagent/create-class
     {:component-did-mount
      (fn [this]
-       (r/dispatch [:show-page-p :page-about])
+       (r/dispatch [:nav-item-click "ABOUT"])
        (r/dispatch [:nav-p-click :34]))
      :reagent-render
      (let [page (r/subscribe [:page-active])
@@ -140,11 +171,11 @@
             [:a {:href "http://keyput.com" :target "_blank"}
              (map-indexed (fn [i c] ^{:key i} [particle-view c :page-about]) "keyput.com")]]]
           [:div.page {:style {:z-index (if (= @page :page-tools) 100 0)}}
-           [:div (map-indexed (fn [i c] ^{:key i} [particle-view c :page-tools]) "HTML5/CSS3/LESS/SASS")]
+           [:div (map-indexed (fn [i c] ^{:key i} [particle-view c :page-tools]) "HTML5 CSS3/LESS/SASS")]
            [:div (map-indexed (fn [i c] ^{:key i} [particle-view c :page-tools]) "JavaScript/CoffeScript/ClojureScript")]
-           [:div (map-indexed (fn [i c] ^{:key i} [particle-view c :page-tools]) "Backbone/React/Node/Reagent")]
-           [:div (map-indexed (fn [i c] ^{:key i} [particle-view c :page-tools]) "Ruby/PHP")]
-           [:div (map-indexed (fn [i c] ^{:key i} [particle-view c :page-tools]) "Sinatra/Rails Slim/CakePHP")]]
+           [:div (map-indexed (fn [i c] ^{:key i} [particle-view c :page-tools]) "Backbone/React Node")]
+           [:div (map-indexed (fn [i c] ^{:key i} [particle-view c :page-tools]) "Ruby/Rails PHP/Wordpress")]
+           [:div (map-indexed (fn [i c] ^{:key i} [particle-view c :page-tools]) "UNIX SQL/NOSQL APACHE/NGINX")]]
           [:div.page {:style {:z-index (if (= @page :page-work) 100 0)}}
            [:div (map-indexed (fn [i c] ^{:key i} [particle-view c :page-work]) "WORK")]
            [:div (map-indexed (fn [i c] ^{:key i} [particle-view c :page-work]) "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod.")]]]))}))
