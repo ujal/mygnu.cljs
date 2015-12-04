@@ -7,16 +7,16 @@
             :url "http://www.eclipse.org/legal/epl-v10.html"}
 
   :dependencies [[org.clojure/clojure "1.7.0"]
-                 [org.clojure/clojurescript "1.7.122"]
-                 [org.clojure/core.async "0.1.346.0-17112a-alpha"]
+                 [org.clojure/clojurescript "1.7.189"]
+                 [org.clojure/core.async "0.2.374"]
                  [reagent "0.5.1"]
-                 [re-frame "0.4.1"]
+                 [re-frame "0.5.0"]
                  [camel-snake-kebab "0.3.2"]
                  [bardo "0.1.1-SNAPSHOT"]
-                 [binaryage/devtools "0.3.0"]]
+                 [binaryage/devtools "0.4.1"]]
 
-  :plugins [[lein-cljsbuild "1.0.6"]
-            [lein-figwheel "0.3.9"]]
+  :plugins [[lein-cljsbuild "1.1.1"]
+            [lein-figwheel "0.5.0-2"]]
 
   :source-paths ["src"]
 
