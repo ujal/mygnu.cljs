@@ -27,8 +27,8 @@
                         :source-paths ["src"]
 
                         :figwheel {:on-jsload "mygnu.core/on-js-reload" 
-                                   :websocket-host "192.168.1.4"
-                                   :websocket-url "ws://192.168.1.4:3449/figwheel-ws"}
+                                   :websocket-host "0.0.0.0"
+                                   :websocket-url "ws://0.0.0.0:3449/figwheel-ws"}
 
                         :compiler {:main mygnu.core
                                    :asset-path "js/compiled/out"
